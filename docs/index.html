@@ -30,10 +30,15 @@
     .app-nav a.active {
       border-bottom: 0;
     }
-
-
+    .markdown-section p{
+      font-weight: 400;
+    }
+    blockquote{
+      padding-left: 0 !important;
+    }
     blockquote p {
       padding: 10px;
+      font-weight: 400 !important;
       background: #efefef;
     }
 
@@ -67,8 +72,43 @@
       mergeNavbar: true,
       auto2top: true,
       // loadNavbar: 'nav.md'
+      search: 'auto', // default
+      search : [
+        './',            // => /README.md
+        // '/guide',       // => /guide.md
+        // '/get-started', // => /get-started.md
+        // '/zh-cn/',      // => /zh-cn/README.md
+      ],
+      search:{
+        maxAge: 86400000, // Expiration time, the default one day
+        paths: [], // or 'auto'
+        placeholder: 'Type to search',
+
+        // Localization
+        placeholder: {
+        '/zh-cn/': '搜索',
+        '/': 'Type to search'
+        },
+        noData: 'No Results!',
+
+        // Localization
+        noData: {
+          '/zh-cn/': '找不到结果',
+          '/': 'No Results'
+        },
+
+        // Headline depth, 1 - 6
+        depth: 2,
+
+        hideOtherSidebarContent: false, // whether or not to hide other sidebar content
+        namespace: 'website-1',
+      }
+      
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+
+
 </body>
 </html>
