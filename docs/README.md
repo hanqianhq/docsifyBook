@@ -164,6 +164,8 @@ CENTOS 8
     }
     test()
 
+
+
 我们发现，使用了 let 和 const 后  
 变量不会被挂载到 window 上
 这就和 var 有了明显的区别
