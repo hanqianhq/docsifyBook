@@ -137,10 +137,37 @@ CENTOS 8
   在声明变量之前，我们就可以使用它
 
   这段代码可以翻译为： 
-  
+
     var a   
+    console.log(a)
+    a = 10  
+
+  好了，不仅变量可以提升  
+  函数也会提升  
+
+    console.log(a)  // f a(){}
+    function a(){}
+    var a = 1
+
+看了上面两个例子，我们差不多知道 var 存在的问题了  
+接下来我们来看 let 和 const  
+
+    var a = 1
+    let b = 1
+    const c = 1
+    console.log(window.b)  //undefined
+    console.log(window.c)  //undefined
+
+    function test(){
       console.log(a)
-      a = 10  
+      let a
+    }
+    test()
+
+我们发现，使用了 let 和 const 后  
+变量不会被挂载到 window 上
+这就和 var 有了明显的区别
+
 
 ## 解构赋值和拓展运算符
 

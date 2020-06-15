@@ -7,6 +7,52 @@
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+    <style>
+    .sidebar ul li.active>a {
+      font-weight: 500;
+    }
+
+    .sidebar ul li a:hover {
+      text-decoration: none;
+      color: #42b983;
+    }
+
+    .sidebar-nav>ul>li>a.section-link {
+      font-size: 1.1em;
+      line-height: 1.7;
+      font-weight: 700;
+    }
+
+    .app-nav.no-badge {
+      position: fixed;
+    }
+
+    .app-nav a.active {
+      border-bottom: 0;
+    }
+
+
+    blockquote p {
+      padding: 10px;
+      background: #efefef;
+    }
+
+    .sidebar ul {
+      margin-bottom: 20px;
+    }
+
+    main .content ul li {
+      line-height: 28px;
+    }
+
+    main h1 {
+      display: none;
+    }
+
+    code {
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
   <div id="app"></div>
@@ -15,6 +61,12 @@
       name: '',
       repo: '',
       // loadNavbar: true,
+      // loadSidebar: true,
+      loadNavbar: true,
+      maxLevel: 3,
+      mergeNavbar: true,
+      auto2top: true,
+      // loadNavbar: 'nav.md'
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
