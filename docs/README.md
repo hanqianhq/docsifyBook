@@ -216,6 +216,10 @@ ssh root@192.168.31.90
 
 ## async await 原理？
 
+## 了解 ES6 中的 Set 和 Map 吗？
+
+https://juejin.im/post/5ee71e92f265da76f65329fe
+
 ---
 
 ## 说一下原型链吧（proto，prototype）
@@ -275,6 +279,8 @@ person1 和 person2 都是 Person 的实例
 ## 了解 vue-lazyloader 吗
 
 ## 如何判断一个类型是数组？instanceOf 实现？
+
+https://juejin.im/post/5b0b9b9051882515773ae714
 
 ## 提交表单有哪些常用方法？应用层通信层发生了哪些过程？
 
@@ -355,9 +361,13 @@ person1 和 person2 都是 Person 的实例
 
 ## 事件委托是什么？主要解决什么问题？
 
+http://www.zhangyunling.com/564.html
+
 ---
 
 ## 了解基本的数据类型吗
+
+https://juejin.im/post/5e23eae9f265da3e2a79230c
 
 ##### 先了解一下为什么需要数据类型？
 
@@ -422,18 +432,19 @@ javascript 中任何值都可以转换为布尔值。
 
 ## Interator 迭代器
 
-## 闭包怎么理解？项目中用到过吗
+
 
 ## 一般怎么判断基本的数据类型
 
-## 原型链理解多少？
-
+https://juejin.im/post/5b0554c86fb9a07acb3d3ddc
 
 ## 普通函数和构造函数的区别
 
 ## 深拷贝一个数组怎么做
 
 ## async / await 及实现原理
+
+https://juejin.im/post/5a9516885188257a6b061d72
 
 ## 了解 return 吗？
 
@@ -445,11 +456,20 @@ javascript 中任何值都可以转换为布尔值。
 
 ## 手写懒加载函数
 
+## 怎么理解防抖和节流的
+https://juejin.im/post/5dc3716cf265da4d417652ff
+
 
 
 ## JS 底层运行机制：单线程和同步异步编程
 
 ## 了解作用域吗？怎么预防作用域污染
+
+https://juejin.im/post/5e264f7d51882520c02c8f3e
+
+## 闭包怎么理解？项目中用到过吗
+
+https://juejin.im/post/5e264f7d51882520c02c8f3e
 
 ---
 
@@ -492,12 +512,16 @@ _那么可能你又会有一个疑问，既然 0.1 不是 0.1，那为什么 con
 
 ## 箭头函数和普通函数的区别
 
+https://juejin.im/post/5c76972af265da2dc4538b64
+
 - 箭头函数更加简洁
 - 箭头函数是不存在 this，它的 this 继承的是函数上下文中的 this
 
 ---
 
 ## 说一下拷贝对象吧，深拷贝浅拷贝
+
+https://juejin.im/post/5ad5b908f265da23870f540d
 
 ## fetch 基础和实战
 
@@ -508,6 +532,8 @@ _那么可能你又会有一个疑问，既然 0.1 不是 0.1，那为什么 con
 ## JS 是否了解过函数式编程
 
 ## 跨域怎么处理？都知道什么方法？ jsonp 和 cors 哪个更安全
+
+https://segmentfault.com/a/1190000011145364
 
 ## 异步的处理方式？都是怎么处理的
 
@@ -523,7 +549,6 @@ CENTOS 7
 
 # Vue
 
-## 双向绑定原理是怎么实现的？
 
 ---
 
@@ -607,6 +632,8 @@ vue框架中状态管理。在main.js引入store，注入
 ## 对 Vue 源码了解吗
 
 ## vue 里的虚拟 dom 是怎么回事
+
+https://juejin.im/post/5d36cc575188257aea108a74
 
 ---
 
@@ -699,6 +726,8 @@ _*Boom！*_
 
 ## Vue 的设计思路有了解吗
 
+<!-- --------------------------------------------------- -->
+
 # 计算机和浏览器原理
 
 ## 如何保证浏览器不受脚本的恶意攻击
@@ -706,6 +735,8 @@ _*Boom！*_
 ---
 
 ## 浏览器渲染页面的过程
+
+https://juejin.im/post/59f1cd855188252c224d3b4e
 
 ## 浏览器输入 URL 到整个页面渲染出来经历的过程详细讲解一下
 
@@ -1109,6 +1140,7 @@ js 代码按照从上至下运行，一旦需要执行的代码，会立刻放�
 > 事件循环 event loop 就是让 js 既是单线程，又不会阻塞下面运行的核心机制  
 > 也是 js 并发模型的基础
 
+https://juejin.im/post/5e37de90f265da3e413f6150
 
 ---
 
