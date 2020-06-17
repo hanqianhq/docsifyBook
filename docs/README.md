@@ -53,6 +53,8 @@ _英文字面上看来，好像是差不多意思_
 
 ## doctype 的作用
 
+https://juejin.im/post/5e8eb8a26fb9a03c4d40f97c
+
 ## 块级标签都有哪些？
 
 ssh root@192.168.31.90
