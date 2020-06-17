@@ -1,0 +1,137 @@
+{
+  "emmet.triggerExpansionOnTab": true,
+  "emmet.includeLanguages": {
+      "vue-html": "html",
+      "vue": "html"
+  },
+  "window.zoomLevel": 0,
+  "gitlens.views.repositories.location": "gitlens",
+  "gitlens.views.fileHistory.location": "gitlens",
+  "gitlens.views.lineHistory.location": "gitlens",
+  "gitlens.views.compare.location": "gitlens",
+  "gitlens.views.search.location": "gitlens",
+  "workbench.colorTheme": "Monokai Dimmed",
+  "sync.removeExtensions": true,
+  "sync.syncExtensions": true,
+  "merge-conflict.codeLens.enabled": false,
+  "merge-conflict.decorators.enabled": false,
+  "files.autoSave": "off",
+  "editor.fontSize": 18,
+  "editor.fontWeight": "400",
+  "editor.fontFamily": "Consolas",
+  "editor.fontLigatures": true, // 这个控制是否启用字体连字，true启用，false不启用，这里选择启用
+  "editor.tokenColorCustomizations": {
+      "textMateRules": [
+          {
+              "name": "italic font",
+              "scope": [
+                  "comment",
+                  "keyword",
+                  "storage",
+                  "keyword.control.import",
+                  "keyword.control.default",
+                  "keyword.control.from",
+                  "keyword.operator.new",
+                  "keyword.control.export",
+                  "keyword.control.flow",
+                  "storage.type.class",
+                  "storage.type.function",
+                  "storage.type",
+                  "storage.type.class",
+                  "variable.language",
+                  "variable.language.super",
+                  "variable.language.this",
+                  "meta.class",
+                  "meta.var.expr",
+                  "constant.language.null",
+                  "support.type.primitive",
+                  "entity.name.method.js",
+                  "entity.other.attribute-name",
+                  "punctuation.definition.comment",
+                  "text.html.basic entity.other.attribute-name.html",
+                  "text.html.basic entity.other.attribute-name",
+                  "tag.decorator.js entity.name.tag.js",
+                  "tag.decorator.js punctuation.definition.tag.js",
+                  "source.js constant.other.object.key.js string.unquoted.label.js"
+              ],
+              "settings": {
+                  "fontStyle": "italic"
+              }
+          }
+      ]
+  },
+  "sync.forceDownload": false,
+  "sync.askGistName": true,
+  "sync.gist": "969af7e8fffbb89262a5bd9ddb6ffec2",
+  "workbench.settings.editor": "json",
+  "workbench.settings.openDefaultSettings": true,
+  "python.pythonPath": "/usr/local/bin/python3",
+  // vscode默认启用了根据文件类型自动设置tabsize的选项
+  "editor.detectIndentation": false,
+  // 重新设定tabsize
+  "editor.tabSize": 2,
+  // #每次保存的时候自动格式化
+  "editor.formatOnSave": true,
+  //  #让函数(名)和后面的括号之间加个空格
+  "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+  //  #去掉代码结尾的分号
+  "prettier.semi": false,
+  //  #使用带引号替代双引号
+  "prettier.singleQuote": true,
+  // #每次保存的时候将代码按eslint格式进行修复
+  // 添加 vue 支持
+  "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      {
+          "language": "html",
+          "autoFix": true
+      },
+      {
+          "language": "vue",
+          "autoFix": true
+      }
+  ],
+  // #这个按用户自身习惯选择
+  "vetur.format.defaultFormatter.html": "prettier",
+  "vetur.format.defaultFormatter.less": "prettier",
+  "vetur.completion.autoImport": true,
+  "vetur.format.defaultFormatterOptions": {
+      "js-beautify-html": {
+          "wrap_attributes": "force-aligned"
+      },
+      "prettier": {
+          "singleQuote": true,
+          "semi": false
+      }
+  },
+  "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+  },
+  "editor.suggestSelection": "first",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "[vue]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+      ".prettierrc": "yaml"
+  },
+  "path-intellisense.autoSlashAfterDirectory": true,
+  "path-intellisense.extensionOnImport": true,
+  "[html]": {
+      "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "editor.parameterHints": true,
+  "editor.quickSuggestions": {
+      "other": true,
+      "comments": true,
+      "strings": true
+  },
+  "liveServer.settings.donotVerifyTags": true,
+  "liveServer.settings.fullReload": true,
+  "workbench.iconTheme": "vscode-icons",
+  "typescript.preferences.quoteStyle": "single",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe"
+  // "powermode.enabled": true
+}
