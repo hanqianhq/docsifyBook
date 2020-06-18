@@ -29,6 +29,34 @@
       position: fixed;
     }
 
+    .app-nav.no-badge ul {
+      padding-top: 0;
+    }
+
+    .app-nav.no-badge ul li h5 {
+      margin: 0;
+      font-size: 14px;
+      border-top: 1px solid #ccc;
+      margin-top: 15px;
+    }
+
+    .app-nav.no-badge ul li {
+      margin: 5px 14px;
+    }
+
+    .app-nav.no-badge ul>li {
+      margin-top: -2px;
+    }
+
+    .app-nav.no-badge ul li h5 a:hover {
+      text-decoration: none;
+      cursor: default;
+    }
+
+    .app-nav.no-badge ul h5:first-child {
+      border-top: none
+    }
+
     .app-nav a.active {
       border-bottom: 0;
     }
@@ -120,7 +148,7 @@
     window.$docsify = {
       name: '',
       repo: '',
-      // loadNavbar: true,
+      loadNavbar: true,
       // loadSidebar: true,
       loadNavbar: true,
       maxLevel: 2,
