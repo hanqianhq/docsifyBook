@@ -1359,8 +1359,9 @@ Request Headers 的 view source
 
 - #### 204 No Content
 
-<img src="/images/http204.png" width="50%">
-  <!-- ![av](/images/http204.png){width="200px"} -->
+<!-- <img src="/images/http204.png" width="50%"> -->
+
+![av](/images/http204.png)
 
 - #### 206 Partial Content
 
@@ -1369,7 +1370,34 @@ Request Headers 的 view source
 - ### 3XX（Redirection 重定向状态码）
 
 - #### 301 Moved Permanently
+
   ![av](/images/http301.png)
+
+- #### 302 Found 临时重定向
+
+该状态码表示请求的资源已被分配了新的 URL，希望用户(本次)能使用新的 URL 访问
+
+<br>
+
+和 301 Moved Permanently 状态码相似，但 302 状态码代表的资源不是被永久移动，只是临时性质的  
+换句话说，已移动的资源对应的 URL 将来还有可能发生改变  
+比如，用户把 URI 保存成书签，但不会像 301 状态码出现时那样去更新书签，而是仍旧保留返回 302 状态码的页面对应的 URL
+
+- #### 303 See Other
+
+  ![av](/images/http302.png)
+
+  该状态码表示由于请求对应的资源存在着另一个 URL，应使用 GET 方法定向获取请求的资源
+
+https://juejin.im/post/5a276865f265da432c23b8d2
+
+- #### 304 Not Modified
+
+打开一个经常访问的网站，看看 Network 传输的静态资源，很多都是 304 状态码，这些表示已经被浏览器缓存了，不需要重新请求服务器
+
+<br>
+
+_你要的资源跟以前一样，直接用以前的吧，我不用再新给你发了_
 
 ---
 
