@@ -448,6 +448,10 @@ https://juejin.im/post/5b0b9b9051882515773ae714
 
 ---
 
+## 关于内存泄漏
+
+---
+
 ## 解构赋值和拓展运算符
 
 ## Set/Map 数据结构
@@ -546,9 +550,11 @@ javascript 中任何值都可以转换为布尔值。
 
 ---
 
-## Promise 设计模式？
+## 对 Promise 的理解
 
 ## 移动端的触摸事件了解吗
+
+## 对 ES6 的理解
 
 ## Interator 迭代器
 
@@ -785,6 +791,10 @@ _在互联网公司为了可以支撑更大的流量，后端往往需要多台�
 
 ---
 
+HTML5 离线存储
+
+---
+
 ## 跨域怎么处理？都知道什么方法？ jsonp 和 cors 哪个更安全
 
 说起跨域请求，必须要了解浏览器的同源策略
@@ -827,15 +837,203 @@ JSONP 的缺点是：它只支持 GET 请求，而不支持 POST 请求等其他
 
 ## 异步的处理方式？都是怎么处理的
 
-sudo sed -i 's/mirrorlist=/#mirrorlist=/g' CentOS-Base.repo CentOS-AppStream.repo CentOS-Extras.repo
-sudo sed -i 's/#baseurl=/baseurl=/g' CentOS-Base.repo CentOS-AppStream.repo CentOS-Extras.repo
-sudo sed -i 's/http:\/\/mirror.centos.org/https:\/\/mirrors.aliyun.com/g' CentOS-Base.repo CentOS-AppStream.repo CentOS-Extras.repo
+#### 我们都知道，JS 是单线程运行的
 
-yum makecache
+每个 window 就是一个 JS 线程
 
-CENTOS 7
+JS 的三大异步来源：用户交互、IO、定时器
 
-<!-- ---------------------------------------------------------------- -->
+<br>
+
+但是，浏览器确不是单线程的
+
+例如 Web kit 引擎，可能有如下线程：
+
+- JavaScript 引擎线程
+- 界面渲染线程
+- 浏览器事件触发线程
+- HTTP 请求线程
+
+
+    setTimeout(()=>{
+      console.log(111)
+    },500);
+
+这段代码的 111 会在什么时候输出？
+是 500ms 时打印吗？
+
+<br>
+
+> 错，是在 500ms 或 500ms 以后某个时段
+
+当一个异步事件发生的时候，它就进入事件队列
+
+浏览器有一个内部大消息循环，Event Loop（事件循环），会轮询事件队列并处理事件
+
+<br>
+
+比如，浏览器当前正在忙于处理 onclick 事件，这时 window onSize 事件发生了，这个异步事件就被放入事件队列等待处理，只有前面的处理完毕了，空闲了才会执行这个事件
+
+首先对于异步事件，我们在执行到这行代码的时候会进行一个注册
+将你要在未来某个时间段要执行的函数注册一下，放在 Event table 中。这个 Event table 中可以有很多事件
+
+<br>
+
+比如你一次发了好多 ajax 请求，那么他们就全部注册了
+
+在未来的时间到了，就会把注册的事件放入 Event queue（任务队列）这个任务队列就是马上要执行的内容
+
+<br>
+
+任务队列什么时候可以执行？
+在主线程的 call stack 为空的时候，会把任务队列的第一个事件放入 call stack 中执行
+
+<br>
+
+这里面涉及一个 queue（队列）的特点就是先进先出
+
+<br>
+
+_在注册后先放入 Event queue 的事件就会更早的离开 Event queue 进入主线程执行_
+
+这个时候是不是觉得自己明白点了？ 唉别高兴的太早了
+
+#### 接下来我们聊一聊宏任务和微任务
+
+##### 常见的宏任务
+
+- setTimeout
+- setInterval
+
+##### 常见的微任务
+
+- promise
+- process.nextTick
+
+#### 它们的执行规则？
+
+首先在 call stack（执行栈） 中的内容执行完毕清空后  
+会在 Event queue 检查一下哪些是宏任务哪些是微任务，然后执行所有的微任务  
+然后再执行一个宏任务，之后再次执行所有的微任务
+
+<br>
+
+也就是说在主线程任务执行完毕后会把任务队列中的微任务全部执行，然后再执行一个宏任务
+
+<br>
+
+这个宏任务执行完再次检查队列内部的微任务，有就全部执行没有就再执行一个宏任务
+
+#### 几种已知的异步解决方案
+
+- 回调函数(callback)
+- 事件监听(发布/订阅)解析
+- Promise 解析及从 0 ～ 1 的源码体验
+- Generator 全面解析
+- Async/Await 解析
+
+- ##### 回调函数（callback）
+
+简单理解就是一个函数被作为参数传递给另一个函数
+
+_回调并不一定就是异步，并没有直接关系，只不过回调函数是异步的一种解决方案_
+
+<br>
+
+假定有两个函数 f1 和 f2，后者等待前者的执行结果
+
+    f1();
+    f2();
+
+如果 f1 是一个很耗时的任务，这么一直等下去，浏览器可能会因此失去响应
+
+<br>
+
+所以我们可以考虑把 f2 写成 f1 的回调函数
+
+![av](/images/callback1.png)
+
+采用这种方式，我们把同步操作变成了异步操作  
+f1 不会堵塞程序运行
+
+<br>
+
+回调函数的优点是简单、容易理解和部署
+
+但是如果需要多次异步调用，而且它们之间的数据还有着依赖关系
+这过深的嵌套，那么恐怖的回调地狱就出现了
+
+<br>
+
+这非常不利于代码的阅读和维护
+
+    doSomethingAsync1(function(){
+        doSomethingAsync2(function(){
+            doSomethingAsync3(function(){
+                doSomethingAsync4(function(){
+                    doSomethingAsync5(function(){
+                        // code...
+                    });
+                });
+            });
+        });
+    });
+
+##### 事件监听（发布订阅模式）
+
+任务的执行不取决于代码的顺序，而取决于某个事件是否发生
+
+<br>
+
+还是以 f1 和 f2 为例，首先，为 f1 绑定一个事件（这里采用的 jQuery 的写法）
+
+    f1.on('done', f2);
+
+上面这行代码的意思是，当 f1 发生 done 事件，就执行 f2。然后，对 f1 进行改写：
+
+![av](/images/fabudingyue.png)
+
+这种方法的优点是比较容易理解，可以绑定多个事件，每个事件可以指定多个回调函数，而且可以"去耦合"，有利于实现模块化
+
+缺点是整个程序都要变成事件驱动型，运行流程会变得很不清晰
+
+#### Promises 对象
+
+ES2015 (ES6)标准化和引入了 Promise 对象，它是异步编程的一种解决方案
+
+简单来说就是用同步的方式写异步的代码，可用来解决回调问题
+
+##### Promise 使用
+
+Promise 是一个构造函数，我们可以通过 new 关键字来创建一个 Promise 实例
+
+也可以直接使用 Promise 的一些静态方法
+
+![av](/images/promise.png)
+
+new Promise 创建了一个 promise 实例，Promise 构造函数会把一个叫做处理器函数(executor function)的函数作为它的参数
+
+<br>
+
+处理器函数接收两个参数分别是 resolve 和 reject  
+这两个参数也是两个回调函数
+
+- resolve 函数在异步操作成功时调用，并将异步操作的结果，作为参数传递出去
+- reject 函数在异步操作失败时调用，并将异步操作报出的错误，作为参数传递出去
+
+简单理解就是一个是成功回调，一个是失败回调
+
+https://juejin.im/post/5e4613b36fb9a07ccc45e339
+
+https://juejin.im/post/5a8fe8a05188255efc5f6c94
+
+https://juejin.im/post/599ff3d5f265da24843e6276
+
+###### 基本用法
+
+![av](/images/promise1.png)
+
+---
 
 # Vue
 
@@ -2034,6 +2232,8 @@ _使用场景： 高要求的体验度，追求界面流畅的应用_
 
 ## 设计模式了解多少？
 
+## 对 webpack 的理解
+
 ## 快速排序的思路是怎样的
 
 ---
@@ -2112,6 +2312,14 @@ https://juejin.im/post/5e37de90f265da3e413f6150
 
 ## 事件模型能介绍一下吗
 
+## 如何管理项目
+
 ## 对算法了解怎么样？常用的排序算法？
 
 ## 讲一下性能优化？具体哪些优化的收益更大一些
+
+# 算法
+
+## 冒泡排序
+
+## 快速排序
