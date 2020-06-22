@@ -1072,17 +1072,139 @@ vue 框架中状态管理。在 main.js 引入 store，注入
 
 ---
 
-## Vue 和 Vuex 的差异？
+## 聊一聊 vuex 吧？
+
+### Vuex 是什么？
+
+Vuex ，状态管理器，用来管理 Vue 的所有组件状态
+
+### 为什么使用 Vuex？
+
+当你打算开发大型单页应用（SPA），会出现多个视图组件依赖同一个状态，来自不同视图的行为需要变更同一个状态
+
+<br>
+
+遇到以上情况时候，你就应该考虑使用 Vuex 了  
+它能把组件的共享状态抽取出来，当做一个全局单例模式进行管理
+
+<br>
+
+这样不管你在何处改变状态，都会通知使用该状态的组件做出相应修改
+
+#### 看一个简单的 vuex demo
+
+![av](/images/vuex1.png)
+
+每一个 Vuex 应用就是一个 store，在 store 中包含组件中的共享状态 state 和改变状态的方法（暂且称作方法）mutations
+
+<br>
+
+需要注意的是只能通过 mutations 改变 store 的 state 的状态  
+不能通过 store.state.count = 5 来直接更改（其实可以更改，不建议这么做，不通过 mutations 改变 state，状态不会被同步）
+
+<br>
+
+使用 store.commit 方法触发 mutations 改变 state：
+
+    store.commit('increment');
+    console.log(store.state.count)  // 1
+
+### 在 Vue 组件使用 Vuex
+
+如果希望 Vuex 状态更新，相应的 Vue 组件也得到更新  
+最简单的方法就是在 Vue 的 computed（计算属性）获取 state
+
+![av](/images/vuex2.png)
+
+上面的例子是直接操作全局状态 store.state.count，那么每个使用该 Vuex 的组件都要引入
+
+<br>
+
+为了解决这个，Vuex 通过 store 选项，提供了一种机制将状态从根组件注入到每一个子组件中
+
+![av](/images/vuex3.png)
+
+通过这种注入机制，就能在子组件 Counter 通过 `this.$store` 访问：
+
+![av](/images/vuex4.png)
+
+通过计算属性来获取，还是太过重复了  
+我们可以使用 mapState 来简化这个过程
+
+![av](/images/vuex5.png)
+
+https://www.jianshu.com/p/caff7b8ab2cf
+
+---
 
 ## Vue 设计原则的理解？
 
 ## vue 从 data 改变到页面渲染的过程
 
+## 说一说 route 和 router 的区别
+
+- route 是“路由信息对象”，包括 path，params，hash，query，fullPath，matched，name 等路由信息参数
+- router 是“路由实例”对象包括了路由的跳转方法，钩子函数等
+
 ## 如果没有 vue-router，你们还会做单页面应用吗
 
 ## Vuex 的触发过程 （actions，state，view）？
 
-## 关于 VUE 的性能优化
+---
+
+## 对 keep-alive 了解吗？
+
+keep-alive 可以实现组件缓存，当组件切换时不会对当前组件进行卸载
+
+<br>
+
+常用的两个属性 include/exclude，允许组件有条件的进行缓存  
+两个生命周期 activated/deactivated，用来得知当前组件是否处于活跃状态  
+keep-alive 的中还运用了 LRU(Least Recently Used)算法
+
+## 你都做过哪些关于 VUE 的性能优化
+
+### 1、代码层面优化
+
+- 尽量减少 data 中的数据，data 中的数据都会增加 getter 和 setter，会收集对应的 watcher
+- v-if 和 v-show 区分使用场景
+- computed 和 watch 区分使用场景
+- v-for 遍历必须为 item 添加 key，且避免同时使用 v-if
+- SPA 页面采用 keep-alive 缓存组件
+- key 保证唯一
+- 长列表性能优化
+- 防抖、节流
+- 图片资源懒加载
+- 路由懒加载
+- 第三方插件的按需引入
+- 优化无限列表性能，即长列表滚动到可视区域动态加载
+- 服务端渲染 SSR or 预渲染
+
+### 2、Webpack 层面的优化
+
+- Webpack 对图片进行压缩
+- 减少 ES6 转为 ES5 的冗余代码
+- 提取公共代码
+- 模板预编译
+- 提取组件的 CSS
+- 优化 SourceMap
+- 构建结果输出分析
+- Vue 项目的编译优化
+
+### 3、基础的 web 技术优化
+
+- 开启 gzip 压缩
+- 浏览器缓存
+- CDN 的使用
+- 使用 Chrome Performance 查找性能瓶颈
+
+---
+
+## vue.js 的两个核心是什么？
+
+数据驱动和组件系统
+
+---
 
 ## 双向绑定原理？
 
@@ -1113,7 +1235,68 @@ vue 框架中状态管理。在 main.js 引入 store，注入
 
 ## 对 Vue 源码了解吗
 
-## VUE 的性能优化
+---
+
+## 说一下响应式数据的原理
+
+当创建 Vue 实例时,vue 会遍历 data 选项的属性，利用 Object.defineProperty 为属性添加 getter 和 setter 对数据的读取进行劫持（getter 用来依赖收集,setter 用来派发更新），并且在内部追踪依赖,在属性被访问和修改时通知变化
+
+<br>
+
+每个组件实例会有相应的 watcher 实例  
+会在组件渲染的过程中记录依赖的所有数据属性（进行依赖收集,还有 computed watcher，user watcher 实例）
+
+之后依赖项被改动时，setter 方法会通知依赖与此 data 的 watcher 实例重新计算（派发更新），从而使它关联的组件重新渲染
+
+<br>
+
+响应式的核心机制是观察者模式，数据是被观察的一方，一旦发生变化，通知所有观察者，这样观察者可以做出响应
+
+比如当观察者为视图时，视图可以做出视图的更新
+
+> Vue.js 的响应式系统以来三个重要的概念，Observer、Dep、Watcher
+
+- Observer : 它的作用是给对象的属性添加 getter 和 setter，用于依赖收集和派发更新
+
+- Dep : 用于收集当前响应式对象的依赖关系,每个响应式对象包括子对象都拥有一个 Dep 实例（里面 subs 是 Watcher 实例数组）,当数据有变更时,会通过 dep.notify()通知各个 watcher
+
+- Watcher : 观察者对象 , 实例分为渲染 watcher (render watcher),计算属性 watcher (computed watcher),侦听器 watcher（user watcher）三种
+
+一句话总结下来就是：vue.js 采用数据劫持结合发布-订阅模式  
+通过 Object.defineproperty 来劫持各个属性的 setter，getter，在数据变动时发布消息给订阅者，触发响应的监听回调
+
+---
+
+## computed 和 watch 有什么区别？
+
+- #### computed 计算属性
+
+  依赖其它属性值，并且 computed 的值有缓存，只有它依赖的属性值发生改变  
+   下一次获取 computed 的值时才会重新计算 computed 的值
+
+- #### watch 侦听器
+  更多的是「观察」的作用，无缓存性，类似于某些数据的监听回调  
+   每当监听的数据变化时都会执行回调进行后续操作
+
+#### 运用场景
+
+当我们需要进行数值计算，并且依赖于其它数据时，应该使用 computed  
+因为可以利用 computed 的缓存特性，避免每次获取值时，都要重新计算
+
+<br>
+
+当我们需要在数据变化时执行异步或开销较大的操作时，应该使用 watch  
+使用 watch 选项允许我们执行异步操作 ( 访问一个 API )，限制我们执行该操作的频率，并在我们得到最终结果前，设置中间状态，这些都是计算属性无法做到的
+
+---
+
+## data 为什么要写成函数？
+
+组件复用时所有组件实例都会共享 data  
+如果 data 是对象就会造成一个组件修改 data 以后会影响到其他所有组件，所以需要将 data 写成函数  
+每次用到就调用一次函数获得新的数据
+
+---
 
 ## 对 Vue3.0 的新特性有没有了解？
 
