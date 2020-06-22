@@ -17,5 +17,4 @@
   - [Mock.js](Mockjs.md)
   - [b 文件](bar/b)
 
-* foo 目录
-  - [one](foo/one)
+* [回到首页](README.md)
