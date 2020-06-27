@@ -1,5 +1,142 @@
 # HTML
 
+## HTML5 有什么新特性？
+
+### 1.增加了语义化标签
+
+总是使用 div 标签对语义来说是不清晰的  
+所以 html5 规范了这一点
+
+- `<hrader></header>` 头部区域标签，块级标签
+- `<footer></footer>` 底部区域标签，块级标签
+- `<nav></nav>` 导航区域标签，块级标签
+- `<time></time>` 时间区域标签，内联标签
+- `<article></article>` 文章段落标签，块级标签
+- `<aside></aside>` 侧边栏区域标签，块级标签
+- `<mark></mark>` 标记记号标签，内联标签
+- `<summary></summary>` 单词翻译: 摘要，h5 官方文档描述：定义 details 元素的标题，块级标签
+- `<detailes></detailes>` 单词翻译：细节，h5 官方文档描述：定义元素的细节，块级标签
+- `<section></section>` 单词翻译：部分，h5 官方文档描述：定义 section，块级标签
+
+### 2.新的表单类型
+
+- `<input type="email" />` e-mail 地址的输入域
+- `<input type="number" />` 数字输入域
+- `<input type="url" />` URL 地址的输入域
+- `<input type="range" />` range 类型显示为滑动条，默认 value 值是 1~100 的限定范围，也可以通过 min 属性和 max 属性自定义范围`<input type="range" name="points" min="1" max="10" />`
+- `<input type="search" />` 用于搜索域
+- `<input type="color" />` 用于定义选择颜色
+- `<input type="tel" />` 电话号码输入域
+- `<input type="date" />` date 类型为时间选择器
+
+以及一些表单的新属性
+
+- placehoder 属性，简短的提示在用户输入值前会显示在输入域上。即我们常见的输入框默认提示，在用户输入后消失
+- required 属性，是一个 boolean 属性。要求填写的输入域不能为空
+- pattern 属性，描述了一个正则表达式用于验证 `<input>` 元素的值。
+- min 和 max 属性，设置元素最小值与最大值。
+- step 属性，为输入域规定合法的数字间隔。
+- height 和 width 属性，用于 image 类型的 `<input>` 标签的图像高度和宽度。
+- autofocus 属性，是一个 boolean 属性。规定在页面加载时，域自动地获得焦点。
+- multiple 属性 ，是一个 boolean 属性。规定 `<input>` 元素中可选择多个值
+
+### 3.视频和音频
+
+视频`<video>`和音频`<audio>`
+
+### 4.Canvas 绘图
+
+canvas 元素用于在网页上绘制图形，canvas 标签本身只是个图型容器，需要使用 javaScript 脚本来绘制图形
+
+    <canvas id="mycanvas" width="600" height="400"></canvas>
+
+    var myCanvas = document.getElementById('mycanvas');
+    var canvas2d = myCanvas.getContext('2d');
+
+    canvas2d.moveTo(100, 100);  // 线条起始位置
+    canvas2d.lineTo(400, 100);  // 线条结束位置
+    canvas2d.strokeStyle = '#CD5C5C'    // 线条颜色
+    canvas2d.lineWidth = 5；    // 定义线宽
+    canvas2d.font = '20px Arial'; // 定义字体大小和字体类型
+    canvas2d.fillText('Canvas绘图demo', 400, 100)   // 设置绘制的文本和位置
+    canvas2d.stroke();
+
+moveTo(x,y) 定义线条开始坐标  
+lineTo(x,y) 定义线条结束坐标  
+lineWidth 设置线宽  
+fillText()设置绘制的文本和位置  
+stroke()执行绘画
+
+### 5.SVG
+
+可伸缩的矢量图形，SVG 也是一种使用 XML 描述 2D 图形的语言  
+在 SVG 中，每个被绘制的图形均被视为对象。如果 SVG 对象的属性发生变化，那么浏览器能够自动重现图形
+
+<br>
+
+svg 图形的样式和 css 有些不同，fill 是定义图形填充色，stroke 描边色，stroke-width 是线宽  
+如果我们要对 svg 图形操作，那么我们该怎么做呢？
+
+<br>
+
+其实很简单，只需要 document.getElementById() 获取需要操作的 svg 图形节点，然后针对该 svg 图形的属性去操作就可以了  
+对 svg 图形属性的操作可以用 getAttribute() 和 setAttribute()
+
+### 6.拖放（drag 和 drop）
+
+在 h5 之前实现拖拽功能，其实用的是一种模拟方式  
+鼠标 onmousedown 时，获取当前的一些信息，然后在 onmousemove 时不断更新推拽对象的 left 和 top 值，最后在 onmouseup 时对推拽对象彻底赋值，并进行释放后一系列的程序操作
+
+现在 h5 出来后呢，不在需要模拟了，因为它已经有标准的事件 api 了
+
+### 7. 地理定位
+
+通过 getCurrentPosition()获取一系列定位信息  
+getCurrentPosition()有两个回调函数参数，获取地理位置成功的回调和失败的回调
+
+### 8.离线存储
+
+通过创建 cache manifest 文件，可以创建 web 应用的离线版本
+
+<br>
+
+如果要启用应用程序缓存，必须在文档的 `<html>` 标签中包含 manifest 属性：每个指定了 manifest 的页面在用户对其访问时都会被缓存
+
+如果未指定 manifest 属性，则页面不会被缓存
+
+### 9.Web 存储
+
+如果说离线存储是对 web 的资源文件存储，那么 web 存储就是对应用程序里的数据做存储了  
+web 存储提供了两个存储方式：
+
+- localStorage，没有时间限制的数据存储
+- sessionStorage，就是网页还没有关闭的情况下的存储，网页窗口关闭，则数据销毁
+
+在之前，这些都是由 cookie 完成的  
+但是 cookie 不适合大量数据的存储，因为它们由每个对服务器的请求来传递，这使得 cookie 速度很慢而且效率也不高
+
+### 10.WebSocket
+
+WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议
+
+<br>
+
+WebSocket 使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据  
+在 WebSocket API 中，浏览器和服务器只需要完成一次握手，浏览器和服务器之间就形成了一条快速通道，并进行双向数据传输
+
+### 11.Web Workers
+
+web worker 是运行在后台的 JavaScript，独立于其他脚本，不会影响页面的性能  
+您可以继续做任何愿意做的事情：点击、选取内容等等，而此时 web worker 在后台运行
+
+<br>
+
+关于 web worker 的应用大概分为三个部分：
+
+- 创建 web worker 文件，worker 文件是一个单独的 js 文件，写好逻辑后，通过 postMessage()方法吧数据发送出去
+- 调用页面创建 worker 对象，var w = new Worker("worker 文件路径")，然后通过实例对象调用 onmessage 事件进行监听，并获取 worker 文件里返回的数据
+- 终止 web worker，当我们的 web worker 创建后会持续的监听它，需要中止的时候则使用实例上的方法 w.terminate()
+
 ## 谈一谈元素属性 href 和 src 的区别？
 
 ##### 字面区别
@@ -153,7 +290,76 @@ _这一现象虽然怪异，但也是标准对于文本对齐的一种规范处�
 
 ## 为什么要清除浮动？如何清除？
 
+---
+
 ## 不同选择器的权重怎么算的
+
+- !important
+- 行内样式
+- ID 选择器，权重：100
+- clas、属性选择器和伪类选择器，权重：10
+  > 属性选择器指的是：根据元素的属性及属性值来选择元素，比如 button 的 type 属性等
+  > 伪类选择器 :active :focus 等选项
+- 标签选择器和伪元素选择器，权重：1
+  > 伪元素选择器 :before :after
+
+#### 它们之间的关系是
+
+!important > 行内样式 > ID 选择器 > 类选择器 | 属性选择器 | 伪类选择器 > 元素选择器
+
+### 这里要注意的是：
+
+#### 1、不推荐使用 !important
+
+因为`!important`根本没有结构与上下文可言，并且很多时候权重的问题  
+就是因为不知道在哪里定义了一个`!important`而导致的
+
+<br>
+
+那么我们知道尽量不要使用`!important`,也应该知道如何覆盖它
+
+<br>
+
+虽然它的权重最高，但是 id 加上 `!important`是可以覆盖 class 的 `!important`
+
+#### 2、行内样式总覆盖任何外部样式表样式，但会被!important 覆盖
+
+#### 3、联合组成，没有一个选择器属性高
+
+<br>
+
+这句要怎么理解呢？
+
+<br>
+
+无论多少个 class 组成的选择器，都没有一个 ID 选择器权重高  
+无论多少个 ID 组成的选择器，都没有行内样式权重高  
+无论多少个元素组成的选择器，都没有一个 class 选择器权重高
+
+#### 4、元素上的选择器不同的时候，计算权重高的则生效
+
+    .test #test{ }   // class 10 + id 100 = 110
+    .test #test span{}   // class 10 + id 100 + span 1 = 111
+    .test #test .sonClass{}   // class 10+ id 100 + class 10 = 120 //生效
+
+#### 5、权重相同时，与元素距离近的选择器生效
+
+    #content h1 { // css样式表中
+      padding: 5px;
+    }
+    <style type="text/css">
+      #content h1 { // html头部 因为html头部离元素更近一点，所以生效
+        padding: 10px;
+      }
+    </style>
+
+#### 最后总结建议：
+
+- 避免使用 `!important`
+- 利用 id 增加选择器权重
+- 减少选择器的个数（避免层层嵌套）
+
+---
 
 ## 前端几大经典布局的实现方案？
 
@@ -180,23 +386,77 @@ _这一现象虽然怪异，但也是标准对于文本对齐的一种规范处�
 
 ---
 
-## css 的 display 可以取什么值？
+## css 的 display 可以取什么值？说说他们的作用
 
-## 用 ts 实现一个数组的去重
+- inline（默认）–内联
+- none–隐藏
+- block–块显示
+- table–表格显示
+- list-item–项目列表
+- inline-block
 
-## 手写 promise 的实现
+---
 
-## flex 布局和传统布局的区别
+## CSS3 有哪些新特性？
 
-## http 各种状态码的含义
+- RGBA 和透明度
+- background-image：background-origin(content-box/padding-box/border-box) background-size background-repeat
+- word-wrap（对长的不可分割单词换行）word-wrap：break-word
+- 文字阴影：text-shadow： 5px 5px 5px #FF0000;（水平阴影，垂直阴影，模糊距离，阴影颜色）
+- font-face 属性：定义自己的字体
+- 圆角（边框半径）：border-radius 属性用于创建圆角
+- 边框图片：border-image: url(border.png) 30 30 round
+- 盒阴影：box-shadow: 10px 10px 5px #888888
+- 媒体查询：定义两套 css，当浏览器的尺寸变化时会采用不同的属性
 
-## 什么时候用 flex ？除了这种方式居中还能用什么？响应式布局还能怎么做？盒子模型？
+---
+
+## 常见的兼容性问题
+
+- #### 不同浏览器的标签默认的 margin 和 padding 不一样
+
+  \*{margin:0;padding:0;}
+
+- #### IE6 双边距 bug
+
+  块属性标签 float 后，又有横行的 margin 情况下，在 IE6 显示 margin 比设置的大  
+  hack：display:inline; 将其转化为行内属性
+
+- #### 获取属性的不同
+
+  IE 下，可以使用获取常规属性的方法来获取自定义属性，也可以使用 getAttribute() 获取自定义属性  
+  Firefox 下，只能使用 getAttribute() 获取自定义属性  
+  解决方法:统一通过 getAttribute() 获取自定义属性
+
+- #### Chrome 中文界面下默认会将小于 12px 的文本强制按照 12px 显示
+  可通过加入 CSS 属性 -webkit-text-size-adjust: none; 解决
+
+---
+
+## flex 布局和传统布局的区别？什么时候用 flex
+
+该布局模型的目的是提供一种更加高效的方式来对容器中的条目进行布局、对齐和分配空间
+
+<br>
+
+在传统的布局方式中，block 布局是把块在垂直方向从上到下依次排列的，而 inline 布局则是在水平方向来排列
+
+弹性盒布局并没有这样内在的方向限制，可以由开发人员自由操作
+
+---
 
 ## opacity 兼容处理？
 
 > 上面的操作也已经实现的 VSCODE 远程开发的基础步骤
 
+---
+
 ## 介绍一下 postion 属性
+
+- static（默认）：按照正常文档流进行排列
+- relative（相对定位）：不脱离文档流，参考自身静态位置通过 top、bottom、left、right 定位
+- absolute（绝对定位）：参考距其最近一个不为 static 的父级元素通过 top、bottom、left, right 定位
+- fixed(固定定位)：所固定的参照对像是可视窗口
 
 ---
 
@@ -235,10 +495,6 @@ _这一现象虽然怪异，但也是标准对于文本对齐的一种规范处�
 ###### 哈哈
 
 <strong> 定位
-
----
-
-## 不同选择器的权重怎么算的
 
 ---
 
@@ -330,6 +586,10 @@ _这一现象虽然怪异，但也是标准对于文本对齐的一种规范处�
 ## async await 原理？
 
 ## 正则表达式的使用程度
+
+## 用 ts 实现一个数组的去重
+
+## 手写 promise 的实现
 
 ## 了解 ES6 中的 Set 和 Map 吗？
 
