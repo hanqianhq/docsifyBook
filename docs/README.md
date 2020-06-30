@@ -971,6 +971,25 @@ javascript 中任何值都可以转换为布尔值。
 
 #### 那么，什么是 Promise 呢？
 
+    console.dir(Promise)
+
+![av](/images/Promisex.png)
+
+从打印的结果可以看出：
+
+- Promise 其实是一个构造函数，所以可以 new 出一个 Promise 的实例
+- 在 Promise 上有两个函数 resolve（成功之后的回调函数）和 reject（失败后的回调函数）
+- 在 Promise 构造函数的 prototype 属性上，有一个 .then() 方法  
+  所以只要是 Promise 构造函数创建的实例，都可以访问到 .then()方法
+- Promise 表示一个异步操作，每当我们 new 一个 Promise 的实例，这个实例就代表具体的异步操作
+- Promise 创建的实例，是一个异步操作，这个异步操作结果，只有两种结果  
+  状态 1：异步执行成功，需要在内部调用成功的回调函数 resolve 把结果返回给调用者  
+  状态 2：异步执行失败，需要在内部调用失败的回调函数 reject 把结果返回调用者  
+  由于 Promise 的实例是一个异步操作，所以内部拿到操作结果后，无法使用 return 把操作结果返回给调用者，这个时候只能使用回调函数的形式，把成功或失败的结果，返回给调用者
+
+  它的原型（prototype）上有 then，catch 方法  
+   因此只要作为 Promise 的实例，都可以共享并调用 Promise.prototype 上面的方法（then,catch）
+
 <br>
 
 这是异步编程的一种解决方案  
@@ -988,6 +1007,33 @@ javascript 中任何值都可以转换为布尔值。
       .catch(处理异常(异常信息))
 
 我们发现，Promise 的写法，显然更直观，还容易捕获异常
+
+#### Promise 到底怎么用呢？
+
+    let promise = new Promise(function() {
+        // 这个function内部写的就是具体的异步操作
+    }
+
+new 出来 promise，就代表这是一个异步操作
+
+<br>
+我们来看一个具体的例子
+
+    var p = new Promise(function (resolve, reject) {
+                var timer = setTimeout(function () {
+                    console.log('执行操作1');
+                    resolve('这是数据1');
+                }, 1000);
+            });
+            p.then(function (data) {
+                console.log(data);
+                console.log('这是成功操作');
+            });
+
+简单的理解就是调用 resolve 方法，Promise 变为操作成功状态（fulfilled），执行 then 方法里面 onfulfilled 里的操作  
+其实 then 里面的函数就是我们平时所说的回调函数，只不过在这里只是把它分离出来而已
+
+![av](/images/promisejuti.png)
 
 #### 如何理解 Promise 呢？
 
@@ -1057,16 +1103,19 @@ javascript 中任何值都可以转换为布尔值。
 
 除此之外，一定谨记，一个 Promise 对象有三个状态，并且状态一旦改变，便不能再被更改为其他状态
 
+<br>
+
+Promise 有几种状态：
+
 - pending，异步任务正在进行
 - resolved (也可以叫 fulfilled)，异步任务执行成功
 - rejected，异步任务执行失败
 
+简单的理解就是调用 resolve 方法，Promise 变为操作成功状态（fulfilled）  
+执行 then 方法里面 onfulfilled 里的操作  
+其实 then 里面的函数就是我们平时所说的回调函数，只不过在这里只是把它分离出来而已
+
 #### Promise 的使用总结
-
-我们要怎么记忆这个东西呢？
-我们要强迫自己记住这个过程！
-
-<br>
 
 - ###### 首先初始化一个 Promise 对象
 
