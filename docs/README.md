@@ -288,6 +288,47 @@ _这一现象虽然怪异，但也是标准对于文本对齐的一种规范处�
 
 ## 伪类和伪元素有什么区别？
 
+#### _伪类和伪元素都是用来修饰不在文档树中的部分_
+
+### 伪类
+
+伪类存在的意义是为了通过选择器找到那些不存在 DOM 树中的信息以及不能被常规 CSS 选择器获取到的信息
+
+- 获取不存在与 DOM 树中的信息
+
+  比如 a 标签的:link、visited 等，这些信息不存在与 DOM 树结构中，只能通过 CSS 选择器来获取
+
+- 获取不能被常规 CSS 选择器获取的信息
+
+  比如：要获取第一个子元素，我们无法用常规的 CSS 选择器获取，但可以通过 `:first-child` 来获取到
+
+### 伪元素
+
+伪元素用于创建一些不在文档树中的元素，并为其添加样式  
+比如说，我们可以通过 `:before` 来在一个元素前增加一些文本，并为这些文本添加样式  
+虽然用户可以看到这些文本，但是这些文本实际上不在文档树中
+
+<br>
+
+常见的伪元素有：`::before`，`::after`，`::first-line`，`::first-letter`，`::selection`、`::placeholder` 等
+
+> 因此，伪类与伪元素的区别在于：有没有创建一个文档树之外的元素。
+
+#### ::after 和:after 的区别
+
+在实际的开发工作中，我们会看到有人把伪元素写成:after  
+这实际是 CSS2 与 CSS3 新旧标准的规定不同而导致的
+
+<br>
+
+CSS2 中的伪元素使用 1 个冒号，在 CSS3 中，为了区分伪类和伪元素，规定伪元素使用 2 个冒号
+
+所以，对于 CSS2 标准的老伪元素，比如 `:first-line`，`:first-letter`，`:before`，`:after`，写一个冒号浏览器也能识别
+
+但对于 CSS3 标准的新伪元素，比如 `::selection`，就必须写 2 个冒号了
+
+---
+
 ## 为什么要清除浮动？如何清除？
 
 ---
@@ -364,6 +405,8 @@ _这一现象虽然怪异，但也是标准对于文本对齐的一种规范处�
 ## 前端几大经典布局的实现方案？
 
 ## toB 和 toC 的区别
+
+---
 
 ## 移动端布局的几大方案？
 
@@ -1430,8 +1473,6 @@ vue 框架中状态管理。在 main.js 引入 store，注入
 
 ## 聊一聊 vuex 吧？
 
----
-
 ### Vuex 是什么？
 
 Vuex ，状态管理器，用来管理 Vue 的所有组件状态
@@ -1568,7 +1609,7 @@ keep-alive 的中还运用了 LRU(Least Recently Used)算法
   Vue 是单页面应用，可能会有很多的路由引入 ，这样使用 webpcak 打包后的文件很大  
   当进入首页时，加载的资源过多，页面会出现白屏的情况，不利于用户体验  
   如果我们能把不同路由对应的组件分割成不同的代码块，然后当路由被访问的时候才加载对应的组件，这样就更加高效了  
-  这样会大大提高首屏显示的速度，但是可能其他的页面的速度就会降下来
+  这样会大大提高首屏显示的速度，但是可能其他的页面的速度就会降下来  
   ![av](/images/routerjiazai.png)
 - 第三方插件的按需引入
 - ##### 优化无限列表性能，即长列表滚动到可视区域动态加载
@@ -1646,6 +1687,50 @@ keep-alive 的中还运用了 LRU(Least Recently Used)算法
 
 ---
 
+## Class 与 Style 如何动态绑定？
+
+- #### 对象语法
+
+      <div v-bind:class="{ active: isActive, 'text-danger': hasError }"></div>
+
+      data: {
+      	isActive: true,
+      	hasError: false
+      }
+
+- #### 数组语法
+
+      <div v-bind:class="[isActive ? activeClass : '', errorClass]"></div>
+
+      data: {
+      	activeClass: 'active',
+      	errorClass: 'text-danger'
+      }
+
+同样，style 也可以通过语法和数组进行动态绑定
+
+    <div v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+
+    data: {
+    		activeColor: 'red',
+    		fontSize: 30
+    }
+
+或者用数组语法的方式
+
+    <div v-bind:style="[styleColor, styleSize]"></div>
+
+    data: {
+    	styleColor: {
+    		color: 'red'
+    	},
+    	styleSize:{
+    		fontSize:'23px'
+    	}
+    }
+
+---
+
 ## vue.js 的两个核心是什么？
 
 数据驱动和组件系统
@@ -1654,9 +1739,67 @@ keep-alive 的中还运用了 LRU(Least Recently Used)算法
 
 ## 双向绑定原理？
 
+---
+
+## 怎样理解 Vue 的单向数据流
+
+所有的 prop 都使得其父子 prop 之间形成了一个单向下行绑定：父级 prop 的更新会向下流动到子组件中，但是反过来则不行  
+这样会防止从子组件意外改变父级组件的状态，从而导致你的应用的数据流向难以理解
+
+<br>
+
+额外的，每次父级组件发生更新时，子组件中所有的 prop 都将会刷新为最新的值  
+这意味着你不应该在一个子组件内部改变 prop  
+如果你这样做了，Vue 会在浏览器的控制台中发出警告  
+子组件想修改时，只能通过 \$emit 派发一个自定义事件，父组件接收到后，由父组件修改
+
+##### _有两种常见的情况试图改变 prop 的情形：_
+
+- #### 想要使用传入的 prop 值
+
+![av](/images/prop1.png)
+
+这个 prop 用来传递一个初始值  
+这个子组件接下来希望将其作为一个本地的 prop 数据来使用  
+在这种情况下，最好定义一个本地的 data 属性并将这个 prop 赋给其用作初始值
+
+- #### 想要加工这个 prop 在当前页面使用
+
+![av](/images/prop2.png)
+
+这个 prop 以一种原始的值传入且需要进行转换  
+在这种情况下，最好使用这个 prop 的值来定义一个计算属性
+
+---
+
 ## 组件的设计原则
 
 ## 对 flutter 的了解
+
+---
+
+## 如何解决修改对象、数组属性视图不更新的问题？
+
+我们需要明确一下
+Vue 不能检测以下变动的数组：
+
+- 当你利用索引直接设置一个项时，vm.items[indexOfItem] = newValue （this.list[0] = 'x'）
+- 当你修改数组的长度时，例如： vm.items.length = newLength （this.list.length = 2）
+
+#### 如何解决？
+
+- ##### 对于第一个修改属性问题，我们可以使用 `vm.$set(vm.items, indexOfItem, newValue)`
+
+      this.$set(this.list, 0, {name:'xx',age:18});
+
+- ##### 修改数组长度我们可以使用 `vm.items.splice(newLength)`
+      this.list.splice(2);
+
+对象数据也存在这个的情况，推荐使用 Vue.set
+
+    this.$set(this.list, 'a', 11);
+
+---
 
 ## 讲一下 vue 有哪些特性
 
