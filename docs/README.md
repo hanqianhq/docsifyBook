@@ -1025,13 +1025,24 @@ javascript 中任何值都可以转换为布尔值。
 - 在 Promise 构造函数的 prototype 属性上，有一个 .then() 方法  
   所以只要是 Promise 构造函数创建的实例，都可以访问到 .then()方法
 - Promise 表示一个异步操作，每当我们 new 一个 Promise 的实例，这个实例就代表具体的异步操作
-- Promise 创建的实例，是一个异步操作，这个异步操作结果，只有两种结果  
-  状态 1：异步执行成功，需要在内部调用成功的回调函数 resolve 把结果返回给调用者  
-  状态 2：异步执行失败，需要在内部调用失败的回调函数 reject 把结果返回调用者  
-  由于 Promise 的实例是一个异步操作，所以内部拿到操作结果后，无法使用 return 把操作结果返回给调用者，这个时候只能使用回调函数的形式，把成功或失败的结果，返回给调用者
+- Promise 创建的实例，是一个异步操作，这个异步操作结果，只有两种结果
+  - 状态 1：异步执行成功，需要在内部调用成功的回调函数 resolve 把结果返回给调用者  
+    用 resolve 方法将 Promise 对象的状态，从「未完成」变为「成功」（即从 pending 变为 resolved）
+  - 状态 2：异步执行失败，需要在内部调用失败的回调函数 reject 把结果返回调用者  
+    用 reject 方法将 Promise 对象的状态，从「未完成」变为「失败」（即从 pending 变为 rejected）
 
-  它的原型（prototype）上有 then，catch 方法  
-   因此只要作为 Promise 的实例，都可以共享并调用 Promise.prototype 上面的方法（then,catch）
+它的原型（prototype）上有 then，catch 方法  
+ 因此只要作为 Promise 的实例，都可以共享并调用 Promise.prototype 上面的方法（then,catch）
+
+<br>
+
+比如，有若干个异步任务，需要先做任务 1，如果成功后再做任务 2，任何任务失败则不再继续并执行错误处理函数  
+要串行执行这样的异步任务，不用 Promise 需要写一层一层的嵌套代码————回调地域
+
+<br>
+
+有了 Promise，我们只需要简单地写 job1.then(job2).then(job3).catch(handleError)  
+其中 job1、job2 和 job3 都是 Promise 对象
 
 <br>
 
@@ -1050,6 +1061,8 @@ javascript 中任何值都可以转换为布尔值。
       .catch(处理异常(异常信息))
 
 我们发现，Promise 的写法，显然更直观，还容易捕获异常
+
+![av](/images/promise!.png)
 
 #### Promise 到底怎么用呢？
 
@@ -1077,6 +1090,54 @@ new 出来 promise，就代表这是一个异步操作
 其实 then 里面的函数就是我们平时所说的回调函数，只不过在这里只是把它分离出来而已
 
 ![av](/images/promisejuti.png)
+
+#### 那怎么使用 reject 呢？
+
+那就是调用 reject 方法后，Promise 状态变为 rejected，即操作失败状态  
+此时执行 then 方法里面 onrejected 操作
+
+<br>
+
+上面我们提到了 then 方法有两个参数，一种是 Promise 状态为 fulfilled 时执行（onfullfilled），一种是 Promise 状态为 rejected 时执行（onrejected）  
+其实就是类似于 jquery 里的 hover 方法里面的两个参数一样，来看看下面的例子：
+
+    var p = new Promise(function (resolve, reject) {
+          var flag = false;
+          if(flag){
+            resolve('这是数据2');
+          }else{
+            reject('这是数据2');
+          }
+        });
+        p.then(function(data){//状态为fulfilled时执行
+            console.log(data);
+            console.log('这是成功操作');
+        },function(reason){ //状态为rejected时执行
+            console.log(reason);
+            console.log('这是失败的操作');
+        });
+
+#### 再来看看 catch
+
+    var p = new Promise(function (resolve, reject) {
+    		var flag = false;
+    		if(flag){
+    			resolve('这是数据2');
+    		}else{
+    			reject('这是数据2');
+    		}
+    });
+    p.then(function(data){
+    		console.log(data);
+    		console.log('这是成功操作');
+    }).catch(function(reason){
+    		console.log(reason);
+    		console.log('这是失败的操作');
+    });
+
+这个 catch 方法的作用是什么呢？  
+和 then 方法中的第二个参数一样  
+就是在 Promise 状态为 rejected 时执行，then 方法捕捉到 Promise 的状态为 rejected，就执行 catch 方法里面的操作
 
 #### 如何理解 Promise 呢？
 
@@ -1146,6 +1207,16 @@ new 出来 promise，就代表这是一个异步操作
 
 除此之外，一定谨记，一个 Promise 对象有三个状态，并且状态一旦改变，便不能再被更改为其他状态
 
+看一个改造回调地域例子：
+
+![av](/images/huidiaodiyu.png)
+
+用 promise 处理：
+
+![av](/images/huidiaogaizao.png)
+
+可能代码不会减少，甚至更多，但是却大大增强了其可读性和可维护性
+
 <br>
 
 Promise 有几种状态：
@@ -1184,13 +1255,13 @@ Promise 有几种状态：
 
       //如果传入的 value 本身就是 Promise 对象，则该对象作为 Promise.resolve 方法的返回值返回。
       function fn(resolve){
-          setTimeout(function(){
-              resolve(123);
-          },3000);
+      	 setTimeout(function(){
+      		resolve(123);
+      	},3000);
       }
       let p0 = new Promise(fn);
       let p1 = Promise.resolve(p0);
-      // 返回为true，返回的 Promise 即是 入参的 Promise 对象。
+      // 返回为 true，返回的 Promise 即是 入参的 Promise 对象。
       console.log(p0 === p1);
 
 这个方法就是，传入不同类型的 value 值，返回的结果也有区别  
@@ -1202,16 +1273,44 @@ Promise 有几种状态：
 value 是上一个任务的返回结果  
 then 中的函数一定要 return 一个结果或者一个新的 Promise 对象，才可以让之后的 then 回调接收
 
+- ##### Promise.all
+
+多个 Promise 任务同时执行，等到它们都执行完后才会进到 then 里面  
+如果全部成功执行，则以数组的方式返回所有 Promise 任务的执行结果  
+如果有一个 Promise 任务 rejected，则只返回 rejected 任务的结果  
+_all 会把所有异步操作的结果放进一个数组中传给 then_
+
+    function getstr1(){
+    	return new Promise(function(resolve,reject){
+    		setTimeout(function(){
+    			resolve("为了部落！")
+    		}, 2000)
+    	})
+    }
+
+    function getstr2(){
+    	return new Promise(function(resolve,reject){
+    		setTimeout(function(){
+    			resolve("为了酋长！！")
+    		},3000)
+    	})
+    }
+
+    window.onload = function(){
+    	Promise.all([getstr1(),getstr2()]).then(function(data){
+    		console.log(data)
+    	})
+    }
+
 - ##### Promise.race
 
 多个 Promise 任务同时执行，返回最先执行结束的 Promise 任务的结果  
-不管这个 Promise 结果是成功还是失败
+不管这个 Promise 结果是成功还是失败  
+_谁先跑完就以谁为准执行回调_
 
-- ##### Promise.all
-
-多个 Promise 任务同时执行  
-如果全部成功执行，则以数组的方式返回所有 Promise 任务的执行结果  
-如果有一个 Promise 任务 rejected，则只返回 rejected 任务的结果
+    Promise.race([pms1(), pms2(), pms3()]).then(function(data) {
+    		console.log(data);
+    })
 
 ---
 
