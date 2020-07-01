@@ -952,6 +952,448 @@ javascript 中任何值都可以转换为布尔值。
 
 ## 对 Promise 的理解
 
+### Promise 为什么会出现？
+
+在 Promise 出现以前，我们处理一个异步网络请求，大概是这样：
+
+    请求1(function(请求结果1){
+      处理请求结果 1
+    })
+
+看起来还不错  
+但是，需求变化了，我们需要拿到第一个网络请求的结果后，再去执行第二个网络请求，就变成了这样：
+
+    请求1(function(请求结果1){
+        请求2(function(请求结果2){
+            处理请求结果2
+        })
+    })
+
+然后，你懂的  
+当需要的数据变多了之后。。。它就变成了这样：
+
+    请求1(function(请求结果1){
+        请求2(function(请求结果2){
+            请求3(function(请求结果3){
+                请求4(function(请求结果4){
+                    请求5(function(请求结果5){
+                        请求6(function(请求结果3){
+                            ...
+                        })
+                    })
+                })
+            })
+        })
+    })
+
+没错，回调地狱出现了
+
+#### 回调地狱
+
+<br>
+
+它的缺点有很多，比如：
+
+- 代码臃肿
+- 可读性差
+- 耦合度过高，可维护性差
+- 代码复用性差
+- 容易滋生 bug
+- 只能在回调里处理异常
+
+所以，就有人想办法了  
+如何解决异步嵌套的问题呢？
+
+    let 请求结果1 = 请求1();
+    let 请求结果2 = 请求2(请求结果1);
+    let 请求结果3 = 请求3(请求结果2);
+    let 请求结果4 = 请求2(请求结果3);
+    let 请求结果5 = 请求3(请求结果4);
+
+<br>
+
+#### 那么，什么是 Promise 呢？
+
+    console.dir(Promise)
+
+![av](/images/Promisex.png)
+
+从打印的结果可以看出：
+
+- Promise 其实是一个构造函数，所以可以 new 出一个 Promise 的实例
+- 在 Promise 上有两个函数 resolve（成功之后的回调函数）和 reject（失败后的回调函数）
+- 在 Promise 构造函数的 prototype 属性上，有一个 .then() 方法  
+  所以只要是 Promise 构造函数创建的实例，都可以访问到 .then()方法
+- Promise 表示一个异步操作，每当我们 new 一个 Promise 的实例，这个实例就代表具体的异步操作
+- Promise 创建的实例，是一个异步操作，这个异步操作结果，只有两种结果  
+  状态 1：异步执行成功，需要在内部调用成功的回调函数 resolve 把结果返回给调用者  
+  状态 2：异步执行失败，需要在内部调用失败的回调函数 reject 把结果返回调用者  
+  由于 Promise 的实例是一个异步操作，所以内部拿到操作结果后，无法使用 return 把操作结果返回给调用者，这个时候只能使用回调函数的形式，把成功或失败的结果，返回给调用者
+
+  它的原型（prototype）上有 then，catch 方法  
+   因此只要作为 Promise 的实例，都可以共享并调用 Promise.prototype 上面的方法（then,catch）
+
+<br>
+
+这是异步编程的一种解决方案  
+比传统的异步解决方案【回调函数】和【事件】更合理、更强大
+
+<br>
+
+如果使用了 promise，上面的方法要怎么写呢？
+
+    new Promise(请求1)
+      .then(请求2(请求结果1))
+      .then(请求3(请求结果2))
+      .then(请求4(请求结果3))
+      .then(请求5(请求结果4))
+      .catch(处理异常(异常信息))
+
+我们发现，Promise 的写法，显然更直观，还容易捕获异常
+
+#### Promise 到底怎么用呢？
+
+    let promise = new Promise(function() {
+        // 这个function内部写的就是具体的异步操作
+    }
+
+new 出来 promise，就代表这是一个异步操作
+
+<br>
+我们来看一个具体的例子
+
+    var p = new Promise(function (resolve, reject) {
+                var timer = setTimeout(function () {
+                    console.log('执行操作1');
+                    resolve('这是数据1');
+                }, 1000);
+            });
+            p.then(function (data) {
+                console.log(data);
+                console.log('这是成功操作');
+            });
+
+简单的理解就是调用 resolve 方法，Promise 变为操作成功状态（fulfilled），执行 then 方法里面 onfulfilled 里的操作  
+其实 then 里面的函数就是我们平时所说的回调函数，只不过在这里只是把它分离出来而已
+
+![av](/images/promisejuti.png)
+
+#### 如何理解 Promise 呢？
+
+我们可以把 Promise 比作一个保姆，家里的一连串的事情，你只需要吩咐给他，他就能帮你做  
+这样你就可以去做其他事情了
+
+<br>
+
+比如：某一天我要出门办事，但是我还要买菜做饭送到老婆单位  
+出门办的事情很重要，买菜做饭也重要。。但我自己只能做一件事。
+
+<br>
+
+这时我就可以把买菜做饭的事情交给保姆，我会告诉她：
+
+- 你先去超市买菜
+- 用超市买回来的菜做饭
+- 将做好的饭菜送到老婆单位
+- 送到单位后打电话告诉我
+
+我们知道，上面三步都是需要消耗时间的，我们可以理解为三个异步任务  
+利用 Promise 的写法来书写这个操作：
+
+    function 买菜(resolve，reject) {
+        setTimeout(function(){
+            resolve(['西红柿'、'鸡蛋'、'油菜']);
+        },3000)
+    }
+    function 做饭(resolve, reject){
+        setTimeout(function(){
+            //对做好的饭进行下一步处理。
+            resolve ({
+                主食: '米饭',
+                菜: ['西红柿炒鸡蛋'、'清炒油菜']
+            })
+        },3000)
+    }
+    function 送饭(resolve，reject){
+        //对送饭的结果进行下一步处理
+        resolve('老婆的么么哒');
+    }
+    function 电话通知我(){
+        //电话通知我后的下一步处理
+        给保姆加100块钱奖金;
+    }
+
+好了，现在我整理好了四个任务，这时我需要告诉保姆，让她按照这个任务列表去做
+
+    // 告诉保姆帮我做几件连贯的事情，先去超市买菜
+    new Promise(买菜)
+    //用买好的菜做饭
+    .then((买好的菜)=>{
+        return new Promise(做饭);
+    })
+    //把做好的饭送到老婆公司
+    .then((做好的饭)=>{
+        return new Promise(送饭);
+    })
+    //送完饭后打电话通知我
+    .then((送饭结果)=>{
+        电话通知我();
+    })
+
+> 如果我们的后续任务是异步任务的话，必须 return 一个 新的 promise 对象  
+> 如果后续任务是同步任务，只需 return 一个结果即可  
+> 我们上面举的例子，除了电话通知我是一个同步任务，其余的都是异步任务，异步任务 return 的是 promise 对象
+
+除此之外，一定谨记，一个 Promise 对象有三个状态，并且状态一旦改变，便不能再被更改为其他状态
+
+<br>
+
+Promise 有几种状态：
+
+- pending，异步任务正在进行
+- resolved (也可以叫 fulfilled)，异步任务执行成功
+- rejected，异步任务执行失败
+
+简单的理解就是调用 resolve 方法，Promise 变为操作成功状态（fulfilled）  
+执行 then 方法里面 onfulfilled 里的操作  
+其实 then 里面的函数就是我们平时所说的回调函数，只不过在这里只是把它分离出来而已
+
+#### Promise 的使用总结
+
+- ###### 首先初始化一个 Promise 对象
+
+  用两种方式都可以创建  
+  1、new Promise(fn)  
+  2、Promise.resolve(fn)
+
+- ###### 然后调用上一步返回的 promise 对象的 then 方法，注册回调函数
+
+  then 中的回调函数可以有一个参数，也可以不带参数  
+  如果 then 中的回调函数依赖上一步的返回结果，那么要带上参数
+
+      new Promise(fn)
+        .then(fn1(value）{
+        //处理 value
+      })
+
+- ###### 最后注册 catch 异常处理函数，处理前面回调中可能抛出的异常
+
+#### Promise 常用 API
+
+- ##### Promise.resolve(value)
+
+      //如果传入的 value 本身就是 Promise 对象，则该对象作为 Promise.resolve 方法的返回值返回。
+      function fn(resolve){
+          setTimeout(function(){
+              resolve(123);
+          },3000);
+      }
+      let p0 = new Promise(fn);
+      let p1 = Promise.resolve(p0);
+      // 返回为true，返回的 Promise 即是 入参的 Promise 对象。
+      console.log(p0 === p1);
+
+这个方法就是，传入不同类型的 value 值，返回的结果也有区别  
+这是一个比较重要的 API
+
+- ##### Promise.prototype.then
+
+实例方法，为 Promise 注册回调函数，函数形式：fn(vlaue){}  
+value 是上一个任务的返回结果  
+then 中的函数一定要 return 一个结果或者一个新的 Promise 对象，才可以让之后的 then 回调接收
+
+- ##### Promise.race
+
+多个 Promise 任务同时执行，返回最先执行结束的 Promise 任务的结果  
+不管这个 Promise 结果是成功还是失败
+
+- ##### Promise.all
+
+多个 Promise 任务同时执行  
+如果全部成功执行，则以数组的方式返回所有 Promise 任务的执行结果  
+如果有一个 Promise 任务 rejected，则只返回 rejected 任务的结果
+
+---
+
+## async / await 及实现原理
+
+ES6 出现了 generator 以及 async/await 语法，使异步处理更加接近同步代码写法，可读性更好  
+同时异常捕获和同步代码的书写趋于一致
+
+<br>
+
+我们把上面的例子重新写一下：
+
+    (async ()=>{
+      let 蔬菜 = await 买菜();
+      let 饭菜 = await 做饭(蔬菜);
+      let 送饭结果 = await 送饭(饭菜);
+      let 通知结果 = await 通知我(送饭结果);
+    })();
+
+总体来说，async 是 Generator 函数的语法糖，并对 Generator 函数进行了改进
+
+### 那，什么是 Generator 函数？
+
+Generator 函数是一个状态机，封装了多个内部状态  
+执行 Generator 函数会返回一个遍历器对象，可以依次遍历 Generator 函数内部的每一个状态，但是只有调用 next 方法才会遍历下一个内部状态  
+所以其实提供了一种可以暂停执行的函数，yield 表达式就是暂停标志
+
+<br>
+
+看这样一段代码：
+
+    function* helloWorldGenerator() {
+      yield 'hello';
+      yield 'world';
+      return 'ending';
+    }
+
+    var hw = helloWorldGenerator();
+
+调用及运行结果：
+
+    hw.next()// { value: 'hello', done: false }
+    hw.next()// { value: 'world', done: false }
+    hw.next()// { value: 'ending', done: true }
+    hw.next()// { value: undefined, done: true }
+
+由结果可以看出，Generator 函数被调用时并不会执行，只有当调用 next 方法、内部指针指向该语句时才会执行，即函数可以暂停，也可以恢复执行  
+每次调用遍历器对象的 next 方法，就会返回一个有着 value 和 done 两个属性的对象  
+value 属性表示当前的内部状态的值，是 yield 表达式后面那个表达式的值  
+done 属性是一个布尔值，表示是否遍历结束
+
+### 那么，async 又是什么呢？
+
+async 函数是 Generator 函数的语法糖  
+使用 关键字 async 来表示，在函数内部使用 await 来表示异步  
+相较于 Generator，async 函数的改进在于下面四点：
+
+- ##### 内置执行器
+
+  Generator 函数的执行必须依靠执行器  
+  而 async 函数自带执行器，调用方式跟普通函数的调用一样
+
+- ##### 更好的语义
+
+  async 和 await 相较于 `*` 和 yield 更加语义化
+
+- ##### 更广的适用性
+
+  co 模块约定，yield 命令后面只能是 Thunk 函数或 Promise 对象  
+  而 async 函数的 await 命令后面则可以是 Promise 或者 原始类型的值  
+  （Number，string，boolean，但这时等同于同步操作）
+
+- ##### 返回值是 Promise
+  函数返回值是 Promise 对象，比 Generator 函数返回的 Iterator 对象方便  
+  可以直接使用 then() 方法进行调用
+
+_async 是 ES7 新出的特性，表明当前函数是异步函数，不会阻塞线程导致后续代码停止运行_
+
+### 那这个新特性要怎么使用呢？
+
+申明之后就可以进行调用了
+
+    async function asyncFn() {
+    　　return 'hello world';
+    }
+    asyncFn();
+
+这样就表示这是异步函数，返回的结果如下：
+
+![av](/images/async.png)
+
+> async 表示函数里有异步操作
+> await 表示紧跟在后面的表达式需要等待结果
+
+返回的是一个 promise 对象，状态为 resolved，参数是 return 的值  
+再看下面这个函数：
+
+    async function asyncFn() {
+        return '我后执行'
+    }
+    asyncFn().then(result => {
+        console.log(result);
+    })
+    console.log('我先执行');
+
+执行结果：
+
+![av](/images/async2.png)
+
+上面的执行结果是先打印出'我先执行'，虽然是上面 asyncFn()先执行，但是已经被定义异步函数了，不会影响后续函数的执行
+
+<br>
+
+async 定义的函数内部会默认返回一个 promise 对象  
+如果函数内部抛出异常或者是返回 reject，都会使函数的 promise 状态为失败 reject
+
+### await 是什么？
+
+await 意思是 async wait(异步等待)
+
+<br>
+
+这个关键字只能在使用 async 定义的函数里面使用  
+任何 async 函数都会默认返回 promise，并且这个 promise 解析的值都将会是这个函数的返回值，而 async 函数必须等到内部所有的 await 命令的 Promise 对象执行完，才会发生状态改变
+
+<br>
+
+举个栗子，await 是学生，async 是校车
+必须等人齐了才开车
+
+<br>
+
+就是说，必须等所有 await 函数执行完毕后，才会告诉 promise 我成功了还是失败了  
+执行 then 或者 catch
+
+    async function awaitReturn() {
+        return await 1
+    };
+    awaitReturn().then(success => console.log('成功', success))
+                .catch(error => console.log('失败',error))
+
+在这个函数里，有一个 await 函数，async 会等到 await 1 这一步执行完了才会返回 promise 状态  
+毫无疑问，判定 resolved
+
+<br>
+
+很多人以为 await 会一直等待之后的表达式执行完之后才会继续执行后面的代码，实际上 await 是一个让出线程的标志  
+await 后面的函数会先执行一遍(比如 await Fn()的 Fn ,并非是下一行代码)，然后就会跳出整个 async 函数来执行后面 js 栈的代码
+
+<br>
+
+等本轮事件循环执行完了之后又会跳回到 async 函数中等待 await 后面表达式的返回值，如果返回值为非 promise 则继续执行 async 函数后面的代码  
+否则将返回的 promise 放入 Promise 队列（Promise 的 Job Queue）
+
+### 其实，async 函数，最难的在错误的处理上
+
+async 里如果有多个 await 函数的时候，如果其中任一一个抛出异常或者报错了  
+都会导致函数停止执行，直接 reject
+
+<br>
+
+该怎么处理呢？  
+可以用 try/catch，遇到函数的时候，可以将错误抛出，并且继续往下执行
+
+    let last;
+    async function throwError() {
+        try{
+          await Promise.reject('error');
+          last = await '没有执行';
+        }catch(error){
+            console.log('has Error stop');
+        }
+    }
+    throwError().then(success => console.log('成功', last))
+                .catch(error => console.log('失败',last))
+
+未完待续...
+
+https://juejin.im/post/5b1ffff96fb9a01e345ba704
+
+---
+
 ## 移动端的触摸事件了解吗
 
 ## 对 ES6 的理解
@@ -965,8 +1407,6 @@ https://juejin.im/post/5b0554c86fb9a07acb3d3ddc
 ## 普通函数和构造函数的区别
 
 ## 深拷贝一个数组怎么做
-
-## async / await 及实现原理
 
 https://juejin.im/post/5a9516885188257a6b061d72
 
@@ -991,6 +1431,8 @@ https://juejin.im/post/5dc3716cf265da4d417652ff
 https://juejin.im/post/5e264f7d51882520c02c8f3e
 
 ## 闭包怎么理解？项目中用到过吗
+
+https://juejin.im/post/5979b5755188253df1067397
 
 https://juejin.im/post/5e264f7d51882520c02c8f3e
 

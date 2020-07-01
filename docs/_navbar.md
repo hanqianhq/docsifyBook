@@ -13,6 +13,10 @@
 
 * 手册们
 
+  - ##### 面试看这个
+  - [ES5 先学好](https://juejin.im/post/5d8acce86fb9a04dfa0956d0)
+  - [大厂面试总结](https://juejin.im/post/5c64d15d6fb9a049d37f9c20#heading-53)
+  - [网络看这一篇](https://juejin.im/post/5e51febde51d4526c932b390)
   - ##### 模拟数据
   - [Mock.js](Mockjs.md)
   - [b 文件](bar/b)
