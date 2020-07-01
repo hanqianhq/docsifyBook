@@ -1491,6 +1491,81 @@ async 里如果有多个 await 函数的时候，如果其中任一一个抛出�
 
 https://juejin.im/post/5b1ffff96fb9a01e345ba704
 
+### 总结一下 Async/Await 的简介和用法
+
+- async/await 是写异步代码的新方式，优于回调函数和 Promise
+- async/await 是基于 Promise 实现的，它不能用于普通的回调函数
+- async/await 与 Promise 一样，是非阻塞的
+- async/await 使得异步代码看起来像同步代码，再也没有回调函数。但是改变不了 JS 单线程、异步的本质
+
+#### Async/Await 的用法
+
+- 使用 await，函数必须用 async 标识
+- await 后面跟的是一个 Promise 实例
+
+<br>
+
+当函数执行的时候，一旦遇到 await 就会先返回  
+等到触发的异步操作完成，再接着执行函数体内后面的语句
+
+#### Async/Await 错误处理
+
+await 命令后面的 Promise 对象，运行结果可能是 rejected  
+所以最好把 await 命令放在 try...catch 代码块中  
+try..catch 错误处理也比较符合我们平常编写同步代码时候处理的逻辑
+
+    async function myFunction() {
+    	try {
+    		await somethingThatReturnsAPromise();
+    	} catch (err) {
+    		console.log(err);
+    	}
+    }
+
+#### Async/Await 好在什么地方？
+
+- ##### 简洁
+
+  使用 Async/Await 明显节约了不少代码  
+   我们不需要写.then，不需要写匿名函数处理 Promise 的 resolve 值  
+   也不需要定义多余的 data 变量，还避免了嵌套代码
+
+- ##### 中间值
+
+  你很可能遇到过这样的场景，调用 promise1，使用 promise1 返回的结果去调用 promise2，然后使用两者的结果去调用 promise3  
+  你的代码很可能是这样的：
+
+      const makeRequest = () => {
+      	return promise1()
+      		.then(value1 => {
+      			return promise2(value1)
+      				.then(value2 => {
+      					return promise3(value1, value2)
+      				})
+      		})
+      }
+
+使用 async/await 的话，代码会变得异常简单和直观
+
+    const makeRequest = async () => {
+    	const value1 = await promise1()
+    	const value2 = await promise2(value1)
+    	return promise3(value1, value2)
+    }
+
+- ##### 条件语句
+
+  某些示例中，需要获取数据，然后根据返回数据决定是直接返回，还是继续获取更多的数据。
+  用 promise 代码嵌套太多，可读性较差
+
+<br>
+
+使用使用 async/await 编写可以大大地提高可读性：
+
+![av](/images/awaitif.png)
+
+> 异步编程的最高境界，就是根本不关心它是不是异步
+
 ---
 
 ## 移动端的触摸事件了解吗
