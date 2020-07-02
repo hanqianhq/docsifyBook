@@ -854,8 +854,6 @@ NONONO，bar 作为一个闭包，即使它内部什么都没有，foo 中的所
 
 ## 解构赋值和拓展运算符
 
-## Set/Map 数据结构
-
 ---
 
 ## null 和 undefined 有什么区别
@@ -1604,12 +1602,6 @@ https://juejin.im/post/5dc3716cf265da4d417652ff
 
 https://juejin.im/post/5e264f7d51882520c02c8f3e
 
-## 闭包怎么理解？项目中用到过吗
-
-https://juejin.im/post/5979b5755188253df1067397
-
-https://juejin.im/post/5e264f7d51882520c02c8f3e
-
 ---
 
 ## 为什么 0.1 + 0.2 != 0.3
@@ -1665,11 +1657,97 @@ https://juejin.im/post/5ad5b908f265da23870f540d
 
 ## fetch 基础和实战
 
+---
+
 ## 谈一谈变量提升？
 
-## json 的数据格式都介绍一下
+先来看两道题
 
-## JS 是否了解过函数式编程
+    function fun () {}
+    var fun = 'fuck bitch'
+    console.log(fun) //？？？
+
+> 这道题输出 fuck bitch  
+> 这并不涉及变量提升，仅仅是同名变量产生了覆盖
+
+    console.log(fun) //？？？
+    function fun () {}
+    var fun = 'fuck bitch'
+
+> 输出 f(){}，这就是因为变量提升
+
+为什么不是 undefined 或者 fuck bitch 呢？  
+它的执行过程其实是：
+
+    function fun () {}
+    console.log(fun) // --> fun(){}
+    fun = 'fuck bitch'
+
+##### 为什么会这样呢？
+
+我们习惯将 var a = 2 看作一个声明，但而实际上 JavaScript 引擎并不这么认为  
+它将 var a 和 a = 2 当作两个单独的声明  
+第一个是编译阶段的任务，而第二个则是执行阶段的任务
+
+#### 重点来了！
+
+所有的声明，不论是声明变量还是声明函数  
+都会被"移动"到各自作用域的最顶端  
+_这个过程，就被称为提升_
+
+> 声明本身会被提升，而包括函数表达式的赋值在内的赋值操作并不会提升。
+
+### 那为什么会出现变量提升呢？
+
+这就涉及到执行上下文的知识了  
+那什么是执行上下文呢？
+
+> 当 JS 引擎解析到可执行代码片段（通常是函数调用阶段）的时候，就会先做一些执行前的准备工作  
+> 这个 “准备工作”，就叫做 "执行上下文(execution context 简称 EC)" 或者也可以叫做执行环境
+
+执行上下文为我们可执行的代码提供了执行前的必要准备工作  
+比如变量对象的定义、作用域链的扩展、提供调用者的对象引用等信息
+
+<br>
+
+一个执行上下文的生命周期可以分为两个阶段：
+
+- 创建阶段  
+  在这个阶段中，执行上下文会创建变量对象，建立作用域链，以及确定 this 指向
+- 代码执行阶段  
+  创建完成后，开始执行代码，这个时候，会完成变量赋值，函数引用以及其他代码
+
+#### 所以变量的创建，实际上是经历几个过程的
+
+- 1、建立 arguments 对象。检查当前上下文中的参数，建立该对象下的属性与属性值
+- 2、检查当前上下文的函数声明（即 function），在变量对象中建立属性，指向内存引用地址
+- 3、检查当前上下文中的变量声明（如果没有声明的变量就会 not defined）  
+  每找到一个变量声明，就在变量对象中建立一个属性，属性值 undefined  
+  注意：如果该变量名的属性已经存在，为了防止同名函数被覆盖为 undefined，则会直接跳过
+
+我们再来看刚才那个例子
+
+    console.log(fun) // fun () {}
+    function fun () {}
+    var fun = 'fuck bitch'
+
+function fun 是被优先提升的，所以变量 fun 因为同名不会覆盖
+
+    // 上例的执行顺序为
+
+    // 首先将所有函数声明放入变量对象中
+    function fun () {}
+
+    // 其次将所有变量声明放入变量对象中，但是因为fun已经存在同名函数，因此此时会跳过undefined的赋值
+    // var fun = undefined;
+
+    // 然后开始执行阶段代码的执行
+    console.log(fun); // function fun
+    fun = 'fuck bitch';
+
+---
+
+## json 的数据格式都介绍一下
 
 ---
 
@@ -2049,6 +2127,287 @@ https://juejin.im/post/599ff3d5f265da24843e6276
 ###### 基本用法
 
 ![av](/images/promise1.png)
+
+---
+
+# 函数式编程
+
+## 是否了解过函数式编程？
+
+函数式编程是一种编程范式，主要是利用函数把运算过程封装起来，通过组合各种函数来计算结果 函数式编程意味着你可以在更短的时间内编写具有更少错误的代码
+
+<br>
+
+函数式编程的两个特点：
+
+- 通过函数来对数据进行转换
+- 通过串联多个函数来求结果
+
+<br>
+
+来看一下命令式和声明式的区别：
+
+- 命令式  
+  我们通过编写一条又一条指令去让计算机执行一些动作，这其中一般都会涉及到很多繁杂的细节  
+   命令式代码中频繁使用语句,来完成某个行为。比如 for、if、switch、throw 等这些语句
+
+- 声明式  
+  我们通过写表达式的方式来声明我们想干什么，而不是通过一步一步的指示  
+   表达式通常是某些函数调用的复合、一些值和操作符，用来计算出结果值
+
+      //命令式
+      var CEOs = [];
+      for(var i = 0; i < companies.length; i++){
+      		CEOs.push(companies[i].CEO)
+      }
+
+      //声明式
+      var CEOs = companies.map(c => c.CEO);
+
+从上面的例子中，我们可以看到声明式的写法是一个表达式，无需关心如何进行计数器迭代，返回的数组如何收集，它指明的是做什么，而不是怎么做  
+函数式编程的一个明显的好处就是这种声明式的代码，对于无副作用的纯函数，我们完全可以不考虑函数内部是如何实现的，专注于编写业务代码
+
+### 函数式编程和高阶函数
+
+函数式编程倾向于复用一组通用的函数功能来处理数据，它通过使用高阶函数来实现  
+高阶函数指的是一个函数以函数为参数，或以函数为返回值，或者既以函数为参数又以函数为返回值
+
+#### 常见的高阶函数有
+
+- map
+- filter
+- reduce
+
+### 函数是一等公民
+
+我们常说函数是 JavaScript 的"第一等公民"  
+指的是函数与其他数据类型一样，处于平等地位，可以赋值给其他变量，也可以作为参数，传入另一个函数，或者作为别的函数的返回值
+
+<br>
+
+_接下来我们看看常见的函数式编程_
+
+---
+
+## 对闭包有了解吗？项目中用到过吗？
+
+函数嵌套函数时，内层函数引用了外层函数作用域下的变量，并且内层函数被全局环境下的变量引用，就形成了闭包
+
+<br>
+
+或者说，如果一个函数引用了自由变量，那么该函数就是一个闭包
+
+<br>
+
+那什么是自由变量呢？  
+自由变量指的是，不属于该函数作用域的变量
+（所有的全局变量都是自由变量，严格来说使用了全局变量的函数都是闭包，但这种闭包没有什么用，  
+通常我们说的闭包是指函数内部的函数）
+
+> 闭包实质上是函数作用域的副产物。
+
+闭包形成的条件：
+
+- 存在内、外两层函数
+- 内存函数对外层函数的局部变量进行引用
+
+### 产生一个闭包
+
+创建闭包最常见方式，就是在一个函数内部创建另一个函数  
+闭包的作用域链包含着它自己的作用域，以及包含它的函数的作用域和全局作用域
+
+    function fn() {
+    	var a = 1,
+    		b = 2
+
+    	function f1() {
+    		return a + b
+    	}
+    	return f1
+    }
+
+此时的 f1，就是一个闭包
+
+> 匿名函数最大的用途是创建闭包  
+> 减少全局变量的使用，从而使用闭包模块化代码，减少全局变量的污染
+
+#### 那闭包有什么缺点呢？
+
+由于闭包会使得函数中的变量都被保存在内存中，内存消耗很大，所以不能滥用闭包，否则会造成网页的性能问题  
+在 IE 中可能导致内存泄露，解决方法时，在退出函数之前，将不使用的局部变量全部删除
+
+    function makeAdder(x) {
+    	return function(y) {
+    		return x + y
+    	}
+    }
+
+    var add5 = makeAdder(5)
+    var add10 = makeAdder(10)
+
+    console.log(add5(2)) // 7
+    console.log(add10(2)) // 12
+
+    // 释放对闭包的引用
+    add5 = null
+    add10 = null
+
+add5 和 add10 都是闭包，它们共享相同的函数定义，但是保存了不同的环境  
+在 add5 的环境中，x 为 5，而在 add10 中，x 则为 10。最后通过 null 释放了 add5 和 add10 对闭包的引用
+
+---
+
+## 高阶函数——map
+
+map() 方法创建一个新数组，其结果是该数组中的每个元素都调用一个提供的函数后返回的结果
+
+> 注意：map 不会改变原数组，它创建的是一个新的数组
+
+假设我们有一个包含名称和种类属性的对象数组，我们想要这个数组中所有名称属性放在一个新数组中，如何实现呢？
+
+    / 不使用高阶函数
+    var animals = [
+      { name: "Fluffykins", species: "rabbit" },
+      { name: "Caro", species: "dog" },
+      { name: "Hamilton", species: "dog" },
+      { name: "Harold", species: "fish" },
+      { name: "Ursula", species: "cat" },
+      { name: "Jimmy", species: "fish" }
+    ];
+    var names = [];
+    for (let i = 0; i < animals.length; i++) {
+      names.push(animals[i].name);
+    }
+    console.log(names); //["Fluffykins", "Caro", "Hamilton", "Harold", "Ursula", "Jimmy"]
+
+
+    // 使用高阶函数
+    var animals = [
+    	{ name: "Fluffykins", species: "rabbit" },
+    	{ name: "Caro", species: "dog" },
+    	{ name: "Hamilton", species: "dog" },
+    	{ name: "Harold", species: "fish" },
+    	{ name: "Ursula", species: "cat" },
+    	{ name: "Jimmy", species: "fish" }
+    ];
+    var names = animals.map(x=>x.name);
+    console.log(names); //["Fluffykins", "Caro", "Hamilton", "Harold", "Ursula", "Jimmy"]
+
+> map()中每个元素都要执行回调函数，所以必须要有 return，否则得到的就可能是一个空数组  
+> 另外，map 是不能来用过滤的
+
+    let arr = [1,2,3];
+    arr = arr.map(item => { return item * 2 })
+
+#### 和 foreach 的区别？
+
+foreach 是没有返回值的，即便是加上 return 也没有  
+而 map 可以有返回值，得到一个新的数组，相当于用旧的数据整理了一组新的数据
+
+---
+
+## 高阶函数——filter
+
+filter() 方法会创建一个新数组，其中包含所有通过回调函数测试的元素  
+filter 为数组中的每个元素调用一次 callback 函数  
+callback 函数返回 true 表示该元素通过测试，保留该元素，false 则不保留  
+filter 不会改变原数组，它返回过滤后的新数组
+
+<br>
+
+假设我们有一个包含名称和种类属性的对象数组。我们想要创建一个只包含狗（species: "dog"）的数组。如何实现呢？
+
+    // 不使用高阶函数
+    var animals = [
+    	{ name: "Fluffykins", species: "rabbit" },
+    	{ name: "Caro", species: "dog" },
+    	{ name: "Hamilton", species: "dog" },
+    	{ name: "Harold", species: "fish" },
+    	{ name: "Ursula", species: "cat" },
+    	{ name: "Jimmy", species: "fish" }
+    ];
+    var dogs = [];
+    for (var i = 0; i < animals.length; i++) {
+    	if (animals[i].species === "dog") dogs.push(animals[i]);
+    }
+    console.log(dogs);
+
+
+    // 使用高阶函数
+    var animals = [
+    	{ name: "Fluffykins", species: "rabbit" },
+    	{ name: "Caro", species: "dog" },
+    	{ name: "Hamilton", species: "dog" },
+    	{ name: "Harold", species: "fish" },
+    	{ name: "Ursula", species: "cat" },
+    	{ name: "Jimmy", species: "fish" }
+    ];
+    var dogs = animals.filter(x => x.species === "dog");
+    console.log(dogs); // {name: "Caro", species: "dog"}
+    // { name: "Hamilton", species: "dog" }
+
+> filter()和 map()很像，也是创建一个新的数组
+
+    let newArr = [1,2,3,4,5].filter(item =>{
+    	if(item > 3) return item
+    })
+    //  => [4,5]
+
+#### 如果我只想知道这组数据中是否有我想要的数据，true or false？
+
+可以使用 some
+
+    var hasbig = potatos.some(potato => { return potato.weight > 100 })
+    //true
+
+有符合条件就行，我知道是 true 了，我并不关心是哪个数据  
+只要有一个 true 出现，就结束遍历，所以性能非常好
+
+> 这里要扩展一下，还有个方法叫 find()  
+> some 是去数组中找有没有，找到第一个符合的就回来报告说：有！  
+> 而 find 也是找到第一个符合的，只不过它拿回来的是具体数据 {id:111,weight:20}  
+> 另外，find 只能拿到数据，如果你想知道这个数据是数组中的第几个，就得 findIndex 一起上了
+
+##### some 和 every 有什么不同？
+
+every 对每一个元素执行一个 callback，直到它找到一个使 callback 返回 false 的元素（没那么大的土豆），就返回 false  
+直到遍历完成也没有返回 false 的话，就返回 true
+
+<br>
+
+简而言之，就是遍历所有元素才终止
+
+## 高阶函数——reduce
+
+reduce 方法对调用数组的每个元素执行回调函数，最后生成一个单一的值并返回  
+reduce 方法接受两个参数：
+
+> reduce()就像 excel 做统计，老板让你把这组数据做一个统计总和  
+> 你把这些数据加在一起得到结果，但是并不会影响原来表格数据
+
+<br>
+
+假设我们要对一个数组求和
+
+    // 不使用高阶函数
+    const arr = [5, 7, 1, 8, 4];
+    let sum = 0;
+    for (let i = 0; i < arr.length; i++) {
+    	sum = sum + arr[i];
+    }
+    console.log(sum);//25
+
+    // 使用高阶函数
+    const arr = [5, 7, 1, 8, 4];
+    const sum = arr.reduce((accumulator, currentValue) => accumulator + currentValue,0);
+    console.log(sum)//25
+
+> reduce()方法接收一个回调函数作为第一个参数，回调函数又接受四个参数，分别是：  
+> 1、previousValue =>初始值或上一次回调函数叠加的值；  
+> 2、currentValue => 本次回调（循环）将要执行的值；  
+> 3、index=>“currentValue”的索引值；  
+> 4、arr => 数组本身；  
+> reduce()方法返回的是最后一次调用回调函数的返回值；
 
 ---
 
