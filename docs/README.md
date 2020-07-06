@@ -532,16 +532,55 @@ CSS2 中的伪元素使用 1 个冒号，在 CSS3 中，为了区分伪类和伪
 
 ---
 
-<strong>记住一共有五中方案</strong>
+- flex 布局，子元素 margin
 
-- 定位三种
-- display：flex
-- javascript
-- display：table-cell
+      .box {
+      	display: flex;
+      	width: 100px;
+      	height: 100px;
+      	background-color: pink;
+      }
 
-###### 哈哈
+      .box-center{
+      	margin: auto;
+      	background-color: greenyellow;
+      }
 
-<strong> 定位
+- flex 布局，主轴纵轴
+
+      .box {
+        display: flex;
+        width: 100px;
+        height: 100px;
+        background-color: pink;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .box-center{
+        background-color: greenyellow;
+      }
+
+- 绝对定位（子元素需要宽高）
+
+      .box {
+        position: relative;
+        height: 100px;
+        width: 100px;
+        background-color: pink;
+      }
+
+      .box-center{
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        margin: auto;
+        width: 50px;
+        height: 50px;
+        background-color: greenyellow;
+      }
 
 ---
 
@@ -860,8 +899,10 @@ NONONO，bar 作为一个闭包，即使它内部什么都没有，foo 中的所
 
 ## null 和 undefined 有什么区别
 
-- undefined 声明了变量，但没有赋值，它存在，但没有值
+- undefined 声明了变量，但没有赋值，它存在，但没有值  
+  调用函数时，应该提供的参数没有提供，该参数就是 undefined
 - null 没有值，根本就不存在，没有任何可读的东西  
+  作为函数的参数，表示该函数的参数不是对象
   <br>
 
 
@@ -881,6 +922,8 @@ NONONO，bar 作为一个闭包，即使它内部什么都没有，foo 中的所
 - undefined + 数字 = NaN
 - null + 数字 = 数字
 
+即在数字情况时，undefined 是 NaN，null 是 0
+
 ---
 
 ## 事件委托是什么？主要解决什么问题？
@@ -889,7 +932,28 @@ http://www.zhangyunling.com/564.html
 
 ---
 
+## typeof 和 instanceof 的区别？
+
+typeof 表示是对某个变量类型的检测，基本数据类型除了 null 都能正常的显示为对应的类型，引用类型除了函数会显示为'function'，其它都显示为 object
+
+<br>
+
+而 instanceof 它主要是用于检测某个构造函数的原型对象在不在某个对象的原型链上
+
+---
+
 ## 数据类型转换？
+
+---
+
+## 关于 this 有什么理解？
+
+对于函数而言指向最后调用函数的那个对象，是函数运行时内部自动生成的一个内部对象，只能在函数内部使用  
+对于全局来说，this 指向 window
+
+#### 函数内的 this 是在什么时候确定的？
+
+函数调用时，指向最后调用的那个对象
 
 ---
 
@@ -1740,6 +1804,43 @@ https://juejin.im/post/5a9516885188257a6b061d72
 
 https://juejin.im/post/5c87b54ce51d455f7943dddb
 
+### 回流
+
+当我们对 DOM 结构的修改引发 DOM 几何尺寸变化的时候，会发生回流的过程
+
+例如：
+
+- 一个 DOM 元素的几何属性变化，常见的几何属性有 width、height、padding、margin、left、top、border 等等  
+  这个很好理解
+
+- 使 DOM 节点发生增减或者移动
+
+- 读写 offset 族、scroll 族和 client 族属性的时候，浏览器为了获取这些值，需要进行回流操作
+
+- 调用 window.getComputedStyle 方法
+
+> 回流过程：由于 DOM 的结构发生了改变，所以需要从生成 DOM 这一步开始，重新经过样式计算、生成布局树、建立图层树、再到生成绘制列表以及之后的显示器显示这整一个渲染过程走一遍，开销是非常大的
+
+### 重绘
+
+当 DOM 的修改导致了样式的变化，并且没有影响几何属性的时候，会导致重绘(repaint)
+
+<br>
+
+由于没有导致 DOM 几何属性的变化，因此元素的位置信息不需要更新  
+所以当发生重绘的时候，会跳过生存布局树和建立图层树的阶段，直接到生成绘制列表，然后继续进行分块、生成位图等后面一系列操作
+
+#### 如何避免触发回流和重绘？
+
+- 避免频繁使用 style，而是采用修改 class 的方式
+- 将动画效果应用到 position 属性为 absolute 或 fixed 的元素上
+- 也可以先为元素设置 display: none，操作结束后再把它显示出来  
+  因为在 display 属性为 none 的元素上进行的 DOM 操作不会引发回流和重绘
+- 使用 createDocumentFragment 进行批量的 DOM 操作
+- 对于 resize、scroll 等进行防抖/节流处理
+- 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来
+- 利用 CSS3 的 transform、opacity、filter 这些属性可以实现合成的效果，也就是 GPU 加速
+
 ---
 
 ## JS 底层运行机制：单线程和同步异步编程
@@ -1802,6 +1903,12 @@ https://juejin.im/post/5c76972af265da2dc4538b64
 
 https://juejin.im/post/5ad5b908f265da23870f540d
 https://juejin.im/post/5ad5b908f265da23870f540d
+
+---
+
+## apply/call/bind 的相同和不同？
+
+---
 
 ## fetch 基础和实战
 
@@ -2077,6 +2184,37 @@ JSONP 的理念就是，与服务端约定好一个回调函数名，服务端�
 当网页接收到这段 Javascript 代码后，就会执行这个回调函数，这时数据已经成功传输到客户端了
 
 JSONP 的缺点是：它只支持 GET 请求，而不支持 POST 请求等其他类型的 HTTP 请求
+
+#### CORS 跨域原理
+
+跨域资源共享(CORS)是一种机制，是 W3C 标准  
+它允许浏览器向跨源服务器，发出 XMLHttpRequest 或 Fetch 请求  
+并且整个 CORS 通信过程都是浏览器自动完成的，不需要用户参与
+
+<br>
+
+而使用这种跨域资源共享的前提是，浏览器必须支持这个功能，并且服务器端也必须同意这种"跨域"请求  
+因此实现 CORS 的关键是服务器需要服务器。通常是有以下几个配置：
+
+- Access-Control-Allow-Origin
+- Access-Control-Allow-Methods
+- Access-Control-Allow-Headers
+- Access-Control-Allow-Credentials
+- Access-Control-Max-Age
+
+浏览器先根据同源策略对前端页面和后台交互地址做匹配，若同源，则直接发送数据请求  
+若不同源，则发送跨域请求
+
+<br>
+
+服务器收到浏览器跨域请求后，根据自身配置返回对应文件头  
+若未配置过任何允许跨域，则文件头里不包含 Access-Control-Allow-origin 字段  
+若配置过域名，则返回 Access-Control-Allow-origin + 对应配置规则里的域名的方式
+
+<br>
+
+浏览器根据接受到的 响应头里的 Access-Control-Allow-origin 字段做匹配，若无该字段，说明不允许跨域，从而抛出一个错误；若有该字段，则对字段内容和当前域名做比对  
+如果同源，则说明可以跨域，浏览器接受该响应；若不同源，则说明该域名不可跨域，浏览器不接受该响应，并抛出一个错误。
 
 ---
 
@@ -2567,16 +2705,34 @@ reduce 方法接受两个参数：
 
 ## 为什么使用 vue 框架而不是使用其他框架？
 
-- 轻量级框架：只关注视图层，是一个构建数据的视图集合，大小只有几十 kb ；
-  <br>
+> 考察 Vue 框架的优点和缺点
 
-- 简单易学：国人开发，中文文档，不存在语言障碍 ，易于理解和学习；双向数据绑定：保留了 angular 的特点，在数据操作方面更为简单；
-  <br>
+### Vue 中最核心的两个特点：响应式和组件化
 
-- 组件化：保留了 react 的优点，实现了 html 的封装和重用，在构建单页面应用方面有着独特的优势；视图，数据，结构分离：使数据的更改更为简单，不需要进行逻辑代码的修改，只需要操作数据就能完成相关操作；
-  <br>
+- #### 响应式
 
-- 虚拟 DOM：dom 操作是非常耗费性能的，不再使用原生的 dom 操作节点，极大解放 dom 操作，但具体操作的还是 dom 不过是换了另一种方式；运行速度更快：相比较于 react 而言，同样是操作虚拟 dom ，就性能而言，vue 存在很大的优势。
+  这也就是 vue.js 最大的优点，通过 MVVM 思想实现数据的双向绑定，通过虚拟 DOM 让我们可以用数据来操作 DOM，而不必去操作真实的 DOM  
+  提升了性能，且让开发者有更多的时间去思考业务逻辑
+
+- #### 组件化
+
+  把一个单页应用中的各个模块拆分到一个个组件当中，或者把一些公共的部分抽离出来做成一个可复用的组件  
+  所以组件化带来的好处就是，提高了开发效率，方便重复使用，使项目的可维护性更强
+
+- ##### 简单易学
+
+  国人开发，中文文档，不存在语言障碍 ，易于理解和学习；
+  双向数据绑定：保留了 angular 的特点，在数据操作方面更为简单
+
+- ##### 轻量级框架
+
+  只关注视图层，是一个构建数据的视图集合，大小只有几十 kb ；
+
+- ##### 虚拟 DOM
+  dom 操作是非常耗费性能的，不再使用原生的 dom 操作节点，极大解放 dom 操作  
+   但具体操作的还是 dom 不过是换了另一种方式；运行速度更快：相比较于 react 而言，同样是操作虚拟 dom ，就性能而言，vue 存在很大的优势
+
+当然还有一些其他问题，比如不利于 SEO、单页应用不能使用浏览器的前进后退、初次加载首屏耗时过长、基于对象配置文件的写法，不利于对一个属性的查找等
 
 ---
 
@@ -2685,6 +2841,26 @@ https://www.jianshu.com/p/caff7b8ab2cf
 
 - route 是“路由信息对象”，包括 path，params，hash，query，fullPath，matched，name 等路由信息参数
 - router 是“路由实例”对象包括了路由的跳转方法，钩子函数等
+
+---
+
+## Vue 中 hash 模式和 history 模式有什么区别？
+
+#### 显示上有明显区别
+
+hash 模式的 URL 中会夹杂着#号，而 history 没有
+
+#### Vue 底层对他们的实现方式不同
+
+hash 模式是依靠 onhashchange 事件(监听 location.hash 的改变)  
+而 history 模式是主要是依靠的 HTML5 history 中新增的两个方法，pushState()可以改变 url 地址且不会发送请求，replaceState()可以读取历史记录栈,还可以对浏览器记录进行修改
+
+#### 通过 URL 向后端发送请求时不同
+
+比如常见的用户手动输入 URL 后回车，或者是刷新(重启)浏览器，这时候 history 模式需要后端的支持  
+因为 history 模式下，前端的 URL 必须和实际向后端发送请求的 URL 一致  
+例如有一个 URL 是带有路径 path 的(例如 `www.lindaidai.wang/blogs/id`)，如果后端没有对这个路径做处理的话，就会返回 404 错误  
+所以需要后端增加一个覆盖所有情况的候选资源，一般会配合前端给出的一个 404 页面
 
 ---
 
@@ -3859,11 +4035,25 @@ _看着高大上，其实是将数据的 0、1 转换成电信号或者光信号
 
 ## HTTP 和 TCP 的区别？
 
+- #### HTTP
+
+  TA 的责任是去定义数据，在两台计算机相互传递信息时，HTTP 规定了每段数据以什么形式表达才是能够被另外一台计算机理解
+
+- #### TCP
+  所要规定的是数据应该怎么传输才能稳定且高效的传递与计算机之间
+
 ---
 
 ---
 
 ## TCP 和 UDP 的区别？TCP 怎样保证传输可靠
+
+- TCP 是一个面向连接、可靠的、基于字节流的传输层协议
+- UDP 是一个面向无连接的传输层协议
+
+TCP 为什么可靠，是因为它有三次握手来保证双方都有接受和发送数据的能力
+
+字节流服务：将大块数据分割为以报文段为单位的数据包进行管理
 
 https://juejin.im/post/5c6fbf54f265da2db718216a
 
@@ -3967,7 +4157,68 @@ _为什么要将图片转为 base64 格式_
 
 ## 同一个对象上绑定了多个事件，执行顺序是怎样的
 
+---
+
 ## 有遇到过跨域问题吗？跨域的原理是什么
+
+> 思考：浏览器为什么会跨域？  
+> 如果跨域安全的话，为什么小程序么有跨域？
+
+跨域的产生来源于现代浏览器所通用的同源策略，所谓同源策略，是指只有在地址的：
+
+- 协议名
+- 域名
+- 端口名
+
+均一样的情况下，才允许访问相同的 cookie、localStorage，以及访问页面的 DOM 或是发送 Ajax 请求  
+若在不同源的情况下访问，就称为跨域
+
+<br>
+
+以下是同源：
+
+    http://www.example.com:8080/index.html
+    http://www.example.com:8080/home.html
+
+以下为跨域：
+
+    http://www.example.com:8080/index.html
+    http://www3.example.com:8080/index.html
+
+但是还要注意一下端口号的问题：
+http 默认的端口号为 80，https 默认端口号为 443
+
+#### 为什么浏览器要禁止跨域？
+
+首先，跨域只存在于浏览器端  
+浏览器它为 web 提供了访问入口，并且访问的方式很简单，在地址栏输入要访问的地址或者点击某个链接就可以了，正是这种开放的形态，所以我们需要对它有所限制
+
+<br>
+
+所以同源策略它的产生主要是为了保证用户信息的安全，防止恶意的网站窃取数据  
+分为两种：Ajax 同源策略与 DOM 同源策略：
+
+- ##### Ajax 同源策略
+
+  它主要做了这两种限制：  
+   1.不同源页面不能获取 cookie；2.不同源页面不能发起 Ajax 请求  
+   我认为它是防止 CSRF 攻击的一种方式吧  
+   因为我们知道 cookie 这个东西它主要是为了解决浏览器与服务器会话状态的问题，它本质上是存储在浏览器或本地文件中一个小小的文本文件，那么它里面一般都会存储了用户的一些信息，包括隐私信息  
+   如果没有 Ajax 同源策略，恶意网站只需要一段脚本就可以获取你的 cookie，从而冒充你的身份去给其它网站发送恶意的请求
+
+- ##### DOM 同源策略
+  它限制了不同源页面不能获取 DOM。例如一个假的网站利用 iframe 嵌套了一个银行网站 mybank.com，并把宽高或者其它部分调整的和原银行网站一样，仅仅只是地址栏上的域名不同，若是用户没有注意的话就以为这个是个真的网站  
+   如果这时候用户在里面输入了账号密码，如果没有同源策略，那么这个恶意网站就可以获取到银行网站中的 DOM，也就能拿到用户的输入内容以此来达到窃取用户信息的攻击
+
+> 同源策略它算是浏览器安全的第一层屏障吧，因为就像 CSRF 攻击，它只能限制不同源页面 cookie 的获取  
+> 但是攻击者还可能通过其它的方式来达到攻击效果
+
+    <iframe name="yinhang" src="www.yinhang.com"></iframe>
+
+    // 由于没有同源策略的限制，钓鱼网站可以直接拿到别的网站的Dom
+    const iframe = window.frames['yinhang']
+    const node = iframe.document.getElementById('你输入账号密码的Input')
+    console.log(`拿到了这个${node}，我还拿不到你刚刚输入的账号密码吗`)
 
 ---
 
