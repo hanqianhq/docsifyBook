@@ -2024,7 +2024,81 @@ this 的设计目的就是在函数体内部，指代函数当前的运行环境
     	}
     }
 
-https://juejin.im/post/5de4fe1d5188255e8b76e1f2#heading-3 未完待续
+#### 构造函数中的 this
+
+当一个函数作为构造器使用时(通过 new 关键字)，它的 this 值绑定到新创建的那个对象  
+如果没使用 new 关键字，那么他就只是一个普通的函数，this 将指向 window 对象
+
+### 现在我们回头来说说 call、apply 和 bind
+
+它们被称为 this 的强绑定  
+就是用来改变函数执行时 this 的指向
+
+    var name = '联盟';
+    function fun(){
+      console.log(this.name);
+    }
+
+    var obj = {
+      name:'萨尔'
+    };
+    fun();  // 联盟
+    fun.call(obj);  // 萨尔
+
+fun.call(obj) 等价于 fun.apply(obj)，也等价于 fun.bind(obj)()
+
+#### 能否作用在箭头函数上呢？
+
+箭头函数中没有 this 绑定，必须通过查找作用域链的方式来决定其值
+
+<br>
+
+如果箭头函数被非箭头函数包含，那么 this 绑定的是最近一层的非箭头函数 this  
+否则 this 就是 undefined
+
+    let name = "zjk";
+
+    let o = {
+        name : "Jake",
+
+        sayName: function () {
+            console.log(this.name)
+        },
+
+        func: function () {
+            setTimeout( () => {
+                this.sayName()
+            },100);
+        }
+
+    };
+
+    o.func()     // Jake
+
+> 使用 call、apply 或 bind 方法给 this 传值，箭头函数会忽略
+
+### 总结一下
+
+call 和 apply 的主要作用，是改变对象的执行上下文，并立即执行  
+bind 也能改变执行上下文，只不过返回值是一个函数，需要再调用一下才能生效
+
+<br>
+
+    为了方便记忆，我们可以这里理解：
+
+    猫吃鱼，狗吃肉，奥特曼打小怪兽。
+
+    有天狗想吃鱼了
+
+    猫.吃鱼.call(狗，鱼)
+
+    狗就吃到鱼了
+
+    猫成精了，想打怪兽
+
+    奥特曼.打小怪兽.call(猫，小怪兽)
+
+    猫也可以打小怪兽了
 
 ---
 
