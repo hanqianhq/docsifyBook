@@ -1976,6 +1976,56 @@ https://juejin.im/post/5ad5b908f265da23870f540d
 
 ## apply/call/bind 的相同和不同？
 
+要搞懂他们，首先我们得了解 this
+
+### this 的出现
+
+this 的设计目的就是在函数体内部，指代函数当前的运行环境  
+我们需要知道这段代码到底在哪里运行
+
+#### global this
+
+在全局范围内:
+
+- this 就等价于 window
+- 用 var 声明的变量和给 this 或者 window 添加属性是一样的
+- 如果你声明变量的时候没有试用 var、let，那你就是在给全局添加属性
+
+      console.log(this === window); //true
+
+      var name = "为了部落";
+      console.log(this.name);  // "为了部落"
+      console.log(window.name);  // "为了部落"
+
+#### function this
+
+记住：在函数中的 this，永远指向调用它的那个对象
+
+    var name = "为了部落！";
+    function sayName() {
+    	var name = "萨尔";
+    	console.log(this.name);   // 为了部落！
+    	console.log(this);    // Window
+    }
+    sayName();
+    console.log(this) // Window
+
+最后调用 sayNama()的地方是全局对象 window，相当于 window.sayName()  
+再来看一个例子：
+
+    var name = '萨鲁法尔';
+    var age = 50;
+    var obj = {
+    		objage:this.age,
+    	name:'伊利丹',
+    	foo:function(){
+    		console.log(this.name + this.age);
+    		// 伊利丹 undefined
+    	}
+    }
+
+https://juejin.im/post/5de4fe1d5188255e8b76e1f2#heading-3 未完待续
+
 ---
 
 ## fetch 基础和实战
@@ -2987,11 +3037,130 @@ keep-alive 可以实现组件缓存，当组件切换时不会对当前组件进
 
 <br>
 
-常用的两个属性 include/exclude，允许组件有条件的进行缓存  
-两个生命周期 activated/deactivated，用来得知当前组件是否处于活跃状态  
-keep-alive 的中还运用了 LRU(Least Recently Used)算法
+有这样一个使用场景  
+我们从主页进入列表页，再从列表页进入详情页
 
----
+<br>
+
+接下来，我们从详情页后退到列表页  
+注意，此时希望这个列表页是加载的缓存，而不是重新请求数据  
+这样可以提升用户体验
+
+<br>
+
+当我们从列表页返回主页的时候，再注销掉列表页，当下次进入时，重新加载数据
+
+### keep-alive 是什么？
+
+keep-alive 是 Vue 提供的一个抽象组件，主要用于保留组件状态或避免重新渲染
+
+<br>
+
+`<keep-alive>`包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们  
+`<keep-alive>`是一个抽象组件，它自身不会渲染一个 DOM 元素，也不会出现在父组件链中
+
+![av](/images/keepalive.gif)
+
+> keep-alive 会把其包裹的所有组件都缓存起来
+
+#### 接下来我们要怎么操作呢？
+
+##### 把需要缓存和不需要缓存的组件区分开来
+
+写两个 router-view
+
+    <keep-alive>
+    	<!-- 需要缓存的视图组件 -->
+    	<router-view v-if="$route.meta.keepAlive">
+    	</router-view>
+    </keep-alive>
+
+    <!-- 不需要缓存的视图组件 -->
+    <router-view v-if="!$route.meta.keepAlive">
+    </router-view>
+
+接下来在 Router 中定义好组件
+
+    new Router({
+    	routes: [
+    		{
+    			path: '/',
+    			name: 'index',
+    			component: () => import('./views/keep-alive/index.vue'),
+    			meta: {
+    				deepth: 0.5
+    			}
+    		},
+    		{
+    			path: '/list',
+    			name: 'list',
+    			component: () => import('./views/keep-alive/list.vue'),
+    			meta: {
+    				deepth: 1
+    				keepAlive: true //需要被缓存
+    			}
+    		},
+    		{
+    			path: '/detail',
+    			name: 'detail',
+    			component: () => import('./views/keep-alive/detail.vue'),
+    			meta: {
+    				deepth: 2
+    			}
+    		}
+    	]
+    })
+
+##### 按需进行 keep-alive
+
+按照官方文档来看
+
+Props:
+
+- include：字符串或正则表达式，只有名称匹配的组件会被缓存
+- exclude：字符串或正则表达式，任何名称匹配的组件都不会被缓存
+
+<br>
+
+我们用 include 数组来实现按需缓存
+
+    <keep-alive :include="include">
+    		<!-- 需要缓存的视图组件 -->
+    	<router-view v-if="$route.meta.keepAlive">
+    	</router-view>
+    </keep-alive>
+
+    <!-- 不需要缓存的视图组件 -->
+    <router-view v-if="!$route.meta.keepAlive">
+    </router-view>
+
+我们还需要在 app.vue 里监听路由变化
+
+    export default {
+      name: "app",
+      data: () => ({
+        include: []
+      }),
+      watch: {
+        $route(to, from) {
+          //如果 要 to(进入) 的页面是需要 keepAlive 缓存的，把 name push 进 include数组
+          if (to.meta.keepAlive) {
+            !this.include.includes(to.name) && this.include.push(to.name);
+          }
+          //如果 要 form(离开) 的页面是 keepAlive缓存的，
+          //再根据 deepth 来判断是前进还是后退
+          //如果是后退
+          if (from.meta.keepAlive && to.meta.deepth < from.meta.deepth) {
+            var index = this.include.indexOf(from.name);
+            index !== -1 && this.include.splice(index, 1);
+          }
+        }
+      }
+    };
+
+最后来验证一下效果
+
+![av](/images/keepresult.gif)
 
 ---
 
@@ -3437,9 +3606,12 @@ _*Boom！*_
 - key 保证唯一
 - 长列表性能优化
 - #### 事件的销毁
+
   Vue 组件销毁时，会自动清理它与其它实例的连接，解绑它的全部指令及事件监听器，但是仅限于组件本身的事件  
   如果在 js 内使用 addEventListene 等方式是不会自动销毁的，我们需要在组件销毁时手动移除这些事件的监听，以免造成内存泄露
+
   ![av](/images/destroy.png)
+
 - 防抖、节流
 - 图片资源懒加载
 - ##### 路由懒加载
@@ -4312,9 +4484,15 @@ _看着高大上，其实是将数据的 0、1 转换成电信号或者光信号
 
 ## dns 劫持是什么？
 
+---
+
 ## 304 状态码的理解？
 
+---
+
 ## https 讲一下过程
+
+---
 
 ## HTTP 和 TCP 的区别？
 
@@ -4324,8 +4502,6 @@ _看着高大上，其实是将数据的 0、1 转换成电信号或者光信号
 
 - #### TCP
   所要规定的是数据应该怎么传输才能稳定且高效的传递与计算机之间
-
----
 
 ---
 
@@ -4350,7 +4526,11 @@ https://juejin.im/post/5c6fbf54f265da2db718216a
 
 ## 做微信小程序有什么亮点，什么难点？
 
+---
+
 ## 用户反馈进入页面白屏，如何排查错误
+
+---
 
 ## 你在团队中的优势是什么？尤其是技术方面
 
