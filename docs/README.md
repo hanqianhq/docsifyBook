@@ -686,6 +686,103 @@ CSS2 中的伪元素使用 1 个冒号，在 CSS3 中，为了区分伪类和伪
 
 ## position 和 float 的区别？
 
+---
+
+## BFC 的理解？
+
+Block fomatting context
+
+<br>
+
+直译过来就是，块级格式化上下文
+
+<br>
+
+它是一个独立的渲染区域，规定了内部该如何布局  
+通俗来讲，BFC 就是一个容器，里面装的都是块级元素
+
+### 怎样可以创建出一个 BFC？
+
+- float
+- overflow：hidden|auto|scroll
+- display：table-cell|table-caption|inline-block|flex
+- position：absolute|fixed
+- 根元素
+
+### BFC 的特性有哪些？
+
+> 思考：了解 BFC 有什么用？
+
+- #### 相邻元素 margin 重叠
+
+      <body>
+        <p>为了联盟！！</p>
+        <p>为了部落！！</p>
+      </body>
+
+      p {
+        width: 200px;
+        line-height: 100px;
+        background: #ccc;
+        text-align: center;
+        margin: 100px;
+      }
+
+![av](/images/bfcmargin.png)
+
+这中间竟然不是 200px 而变成了 100px？？！
+
+如何解决这样的问题？
+只要在一个 p 外面包裹一层容器，并触发它的 BFC 即可，让它们不属于同一个 BFC
+
+    <p>ABC</p>
+    <div class="wrap">
+      <p>abc</p>
+    </div>
+
+    .wrap{
+      overflow:hidden;
+    }
+
+- #### 父子元素 margin 重叠
+
+
+    .box{
+      width:100px;
+      height:100px;
+      background:#ccc;
+    }
+    .wrap {
+      background:yellow;
+    }
+    .wrap h1{
+      background:pink;
+      margin:40px;
+    }
+
+    <body>
+    <div class="box">box</div>
+    <div class="wrap">
+      <h1>h1</h1>
+    </div>
+    </body>
+
+![av](/images/fuzimargin.png)
+
+注意看 h1 和 wrap 父子元素，margin 值效果完全不对  
+而且两个 div 的间距此时为 40px，不应该是 0 吗？
+
+<br>
+
+解决的方法就是，给或者给 wrap 添加 overflow:hidden  
+或者给 wrap 添加一个 border 即可
+
+- #### BFC 不会重叠浮动元素
+
+https://juejin.im/post/5bc33d0d6fb9a05d1658afc7
+
+---
+
 ## CSS 怎么画出一个三角形
 
 ## 旋转动画怎么做？
