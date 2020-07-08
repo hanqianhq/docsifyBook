@@ -137,6 +137,8 @@ web worker 是运行在后台的 JavaScript，独立于其他脚本，不会影�
 - 调用页面创建 worker 对象，var w = new Worker("worker 文件路径")，然后通过实例对象调用 onmessage 事件进行监听，并获取 worker 文件里返回的数据
 - 终止 web worker，当我们的 web worker 创建后会持续的监听它，需要中止的时候则使用实例上的方法 w.terminate()
 
+---
+
 ## 谈一谈元素属性 href 和 src 的区别？
 
 ##### 字面区别
