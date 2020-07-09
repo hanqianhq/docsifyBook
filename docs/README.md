@@ -779,7 +779,70 @@ Block fomatting context
 
 - #### BFC 不会重叠浮动元素
 
-https://juejin.im/post/5bc33d0d6fb9a05d1658afc7
+      box1{
+       height: 100px;
+       width: 100px;
+       float: left;
+       background: lightblue;
+      }
+      box2{width: 200px;
+       height: 200px;
+       background: #eee;
+      }
+
+      <body>
+      <div class="box1">我是一个左浮动的元素</div>
+      <div class="box2">喂喂喂!大家不要生气嘛，生气会犯嗔戒的。悟空你也太调皮了，
+      我跟你说过叫你不要乱扔东西，你怎么又……你看，我还没说完你就把棍子给扔掉了!
+      月光宝盒是宝物，你把它扔掉会污染环境，要是砸到小朋友怎么办，就算砸不到小朋友，
+      砸到花花草草也是不对的。</div>
+      </body>
+
+![av](/images/bfcfloat.png)
+
+为什么是这样？
+
+![av](/images/bfcfloatright.png)
+
+而不是我们以为的这样呢？  
+解决的办法就是给右侧的 box2 加上一个 overflow:hidden，使其单独成为一个 BFC
+
+- #### BFC 可以清除浮动
+
+我们知道，当容器内的元素都浮动了，就会脱离文档流  
+此时包裹他们的父级容器如果不清除浮动，就会失去宽高，都变成了 0
+
+<br>
+
+要解决这个办法，通常就是给父元素添加一个 overflow:hidden 即可
+
+  	<style>
+  	.box1{
+  	  width:100px;
+  	  height:100px;
+  	  float:left;
+  	  border: 1px solid #000;
+  	}
+  	.box2{
+  	  width:100px;
+  	  height:100px;
+  	  float:left;
+  	  border: 1px solid #000;
+  	}
+  	.box{
+  	  background:yellow
+  	}
+  	</style>
+  	<body>
+  	<div class="box">
+  	  <div class="box1"></div>
+  	  <div class="box2"></div>
+  	</div>
+  	</body>
+
+![av](/images/bfcfloatclear.png)
+
+![av](/images/bfcfloatclearfix.png)
 
 ---
 
