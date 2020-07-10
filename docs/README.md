@@ -2322,13 +2322,78 @@ https://juejin.im/post/5c87b54ce51d455f7943dddb
 
 ---
 
-## JS 底层运行机制：单线程和同步异步编程
-
----
-
 ## 了解作用域吗？怎么预防作用域污染
 
-https://juejin.im/post/5e264f7d51882520c02c8f3e
+作用域，就是变量与函数的可访问范围
+
+    function Fn(){
+    	var inX = "内部变量";
+    }
+    Fn(); // 这个函数是可以执行的
+    console.log(inX); // Uncaught ReferenceError: inX is not defined
+
+作用域就是这样一个独立的地盘，变量是不会泄露出去  
+所以不同作用域下的变量名是不会冲突的
+
+    var n = 2;
+    function fn(){
+        a = 1;
+        return a;
+    }
+
+    console.log(fn());  // 1
+    console.log(a);   // 1
+
+上面这个例子，如果一个变量没有声明直接就赋值了，那么它就是一个全局变量
+
+<br>
+
+ES5 中只有全局作用域和函数作用域，它是没有块级作用域这个概念的
+
+所以经常发生由于变量提升，导致了内部变量覆盖了外部变量，引起了作用域污染
+
+    for(var i = 0; i < 10; i ++){
+    	console.log(i);
+    }
+    console.log(i)
+
+这是一道常见的面试题  
+for 循环我们知道会输出 0、1、2...一直到 9  
+此时循环外最后执行的 i，输出了一个 10
+
+<br>
+
+如果你看过 jQuery 源码，你会发现很多代码都是
+
+    (function(){......})()
+
+这是一个自执行函数  
+作用就是防止内部的变量不会泄露，不会污染到外面，对其他类库造成影响
+
+> 函数作用域带来了什么问题？
+
+### ES6 带来了块级作用域
+
+什么是块级作用域？
+
+大括号{}，小括号，比如 if、for 的，这些括起来的，都算是块级作用域  
+只有 ES6 有块级作用域，ES5 没有的
+
+<br>
+
+let 和 const 定义的变量，就只能在块级作用域里访问，不能跨块，更不能跨函数
+
+    {
+    	var a = 1;
+    	let b = 2;
+    	const c = 3;
+    	console.log(a); // 1
+    	console.log(b); // 2
+    	console.log(c); // 3
+    }
+    console.log(a); // 1
+    console.log(b); // b is not defined
+    console.log(c); // c is not defined
 
 ---
 
