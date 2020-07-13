@@ -1035,6 +1035,116 @@ https://juejin.im/post/5b0b9b9051882515773ae714
 
 ---
 
+## new 的实现原理是什么？
+
+- 1、创建一个空对象，构造函数中的 this 指向这个空对象
+- 2、这个新对象被执行【原型】连接
+- 3、执行构造函数方法，属性和方法被添加到 this 引用对象中
+- 4、如果构造函数中没有返回其他对象，那么返回 this，即创建的这个 this 新对象，否则返回构造函数返回的对象
+
+![av](/images/new.png)
+
+---
+
+## 如何正确判断 this 指向？
+
+#### 记住一句话，谁调用它，this 就指向谁
+
+仅仅记住这句话就能明确判断么？并不能。。。
+
+<br>
+
+我们可以按照以下顺序来判断：
+
+- #### 全局环境中的 this
+
+无论是否处于严格模式下，只要在全局执行中（任何函数体外部）  
+this 都指向全局对象 window
+
+<br>
+
+node 环境下，无论是否处于严格模式，全局执行环境中，this 都是空对象{}
+
+- #### 是否 new 绑定
+
+如果使用了 new ，并且构造函数中没有返回 function 或者 object，那么 this 指向这个新对象
+
+    function Super(age){
+      this.age = age;
+    }
+    let instance = new Super('26');
+    console.log(instance.age) // 26
+
+    构造函数返回值不是 function 或 object。 newSuper() 返回的是 this 对象。
+
+<br>
+
+    function Super(age){
+      this.age = age;
+      let obj = {a:'2'};
+      return obj;
+    }
+
+    let instance = new Super('hello');
+    console.log(instance); //{a:'2'}
+    console.log(instance.age);  //undefined
+
+    构造函数返回值是function 或object，newSuper()是返回的是Super种返回的对象
+
+- #### 函数是否通过 call、apply 调用，或者使用了 bind 绑定，如果是，那么 this 绑定的就是制定的对象（显式绑定）
+
+
+    function info(){
+      console.log(this.age);
+    }
+    var person = {
+      age:20,
+      info
+    }
+    var age = 28;
+    var info = person.info;
+    info.call(person); //20
+    info.apply(person); //20
+    info.bind(person)(); //20
+
+注意：这里存在一种特殊情况  
+如果 call、apply、bind 传入的第一个参数是 undefined 或者 null  
+this 指向的是全局对象
+
+- #### 隐式绑定，函数的调用是在某个对象上触发，典型的为 xxx.fn()
+
+
+    function info(){
+      console.log(this.age);
+    }
+    var person = {
+      age:20,
+      info
+    }
+    var age = 28;
+    person.info(); //20; 执行了隐式转换
+
+- #### 箭头函数没有自己的 this，继承的是上下文绑定的 this
+
+
+    let obj = {
+      age:20,
+      info:function(){
+        return()=>{
+          console.log(this.age) // this 继承的是外层上下文绑定的 this
+        }
+      }
+    }
+
+    let person = {age:28};
+    let info = obj.info();
+    info(); //20
+
+    let info2 = obj.info.call(person);
+    info(); //28
+
+---
+
 ## 关于内存泄漏
 
 ### 什么是内存泄漏？
@@ -1267,17 +1377,6 @@ typeof 表示是对某个变量类型的检测，基本数据类型除了 null �
 ---
 
 ## 数据类型转换？
-
----
-
-## 关于 this 有什么理解？
-
-对于函数而言指向最后调用函数的那个对象，是函数运行时内部自动生成的一个内部对象，只能在函数内部使用  
-对于全局来说，this 指向 window
-
-#### 函数内的 this 是在什么时候确定的？
-
-函数调用时，指向最后调用的那个对象
 
 ---
 
@@ -2457,8 +2556,75 @@ https://juejin.im/post/5c76972af265da2dc4538b64
 
 ## 说一下拷贝对象吧，深拷贝浅拷贝
 
-https://juejin.im/post/5ad5b908f265da23870f540d
-https://juejin.im/post/5ad5b908f265da23870f540d
+深拷贝如字面意思，是层层拷贝  
+而浅拷贝只拷贝了一层
+
+- #### 深拷贝
+
+  拷贝后的对象与原对象是完全隔离的，互不影响
+
+- #### 浅拷贝
+  实际上只是拷贝了引用地址，改变值得时候引用也会随之改变
+
+<br>
+
+直接来看一个例子吧
+
+    let obj = {
+      name:'萨尔',
+      age:20,
+      hobbies:['read','sing']
+    }
+
+    此时用两种方式拷贝对象
+    let obj2 = Object.assign({},obj);
+    let obj3 = {...obj};
+
+打印 obj2、obj3 可知，得到了和 obj 一样的数据  
+此时我修改 obj 的第一层基础类型数据
+
+    obj.name = '安度因';
+
+obj2 和 obj3 的值没有改变  
+我修改 obj 的深层非基础类型数据
+
+    obj.hobbies.push("coding");
+
+我们会发现，obj2 和 obj3 的 habbies 都改变成了['read','sing','code']
+
+> 浅拷贝可以用 Object.assign 和...obj 实现  
+> 拷贝对象的第一层属性是基础类型时，新对象和原对象不影响；但是第一层数据是复杂类型时，那么就会被一并影响
+
+我们来看看深拷贝怎么做：
+
+    function deepClone(obj) {
+        let result = typeof  obj.splice === "function" ? [] : {};
+        if (obj && typeof obj === 'object') {
+            for (let key in obj) {
+                if (obj[key] && typeof obj[key] === 'object') {
+                    result[key] = deepClone(obj[key]);//如果对象的属性值为object的时候，递归调用deepClone,即在吧某个值对象复制一份到新的对象的对应值中。
+                } else {
+                    result[key] = obj[key];//如果对象的属性值不为object的时候，直接复制参数对象的每一个键值到新的对象对应的键值对中。
+                }
+            }
+            return result;
+        }
+        return obj;
+    }
+
+
+
+    let testObj = {
+        name: "weiqiujuan",
+        sex: "girl",
+        age: 22,
+        favorite: "play",
+        family: {brother: "son", mother: "haha", father: "heihei"}
+    };
+    let testRes2 = deepClone(testObj);
+    testRes2.family.brother = "weibo";
+
+新对象和旧对象不会相互影响了，这就是深拷贝
 
 ---
 
