@@ -709,27 +709,94 @@ flex 容器有两根轴，水平主轴和交叉纵轴
 
 ---
 
-## position 和 float 的区别？
+## 隐藏页面中某个元素有几种方法？
+
+我们来总结一下思路，规划为三类：
+
+- 完全隐藏：元素没有渲染，不占据空间
+- 视觉隐藏：屏幕中看不见，但是占据空间
+- 语义隐藏：读屏软件不可读，但正常占据空间
+
+### 完全隐藏
+
+#### display 属性
+
+设置为 none 即可
+
+#### hidden 属性
+
+HTML5 新增属性，相当于 display:none
+
+    <div hidden></div>
+
+### 视觉隐藏
+
+#### 用 position 或者 margin，将元素移除可视区域
+
+    left:-9999999px;
+
+    margin-left:-999999px
+
+#### 利用 transform
+
+- 缩放
+
+      transform: scale(0);
+      height: 0;
+
+- 移动
+
+      transform: translateX(-99999px);
+      height: 0;
+
+- 设置其大小为 0
+
+      height:0;
+      width:0;
+      font-size:0; 或者 overflow:hidden
+
+- 透明度为 0
+
+      opacity:0;
+
+- visibility 属性
+
+      visibility:hidden;
+
+- 层级覆盖
+
+      position:relative;
+      z-index:-999;
+
+### 读屏软件不可读，占据空间
+
+    <div aria-hidden="true"></div>
 
 ---
 
 ## BFC 的理解？
 
-Block fomatting context
+Block fomatting context  
+直译过来就是，块级格式化上下文  
+什么意思？
 
 <br>
 
-直译过来就是，块级格式化上下文
+我们都知道，页面是由 css 布局和若干个 BOX 组成的
+
+元素类型和 display 属性，决定了 Box 的类型  
+而不同的 Box 又会参与不同的 fomatting context
 
 <br>
 
-它是一个独立的渲染区域，规定了内部该如何布局  
+Fomatting Context 是一个独立的渲染区域，有自己的一套渲染规则  
+规定了内部元素该如何定位，以及它们之间的相互作用  
 通俗来讲，BFC 就是一个容器，里面装的都是块级元素
 
 ### 怎样可以创建出一个 BFC？
 
-- float
-- overflow：hidden|auto|scroll
+- float 浮动元素
+- overflow：hidden|auto|scroll 不为 visible
 - display：table-cell|table-caption|inline-block|flex
 - position：absolute|fixed
 - 根元素
@@ -917,6 +984,32 @@ Block fomatting context
 ## 用 ts 实现一个数组的去重
 
 ## 手写 promise 的实现
+
+---
+
+## 异步加载 JS 脚本的方式有哪些？
+
+#### async 或者 defer
+
+#### 它们两个的区别在于：
+
+- defer 要等到整个页面在内存中正常渲染结束（DOM 结构完全生成，以及其他脚本执行完成）  
+  在 window.onload 之前执行
+- async 一旦下载完，渲染引擎就会中断，执行整个 js 脚本，执行完后再继续页面渲染
+- 如果有多个 defer 脚本，它们会按照在页面中出现的顺序来执行
+- 多个 async 脚本不能保证加载顺序
+
+<br>
+
+async 是 HTML5 新增的属性，用法是：
+
+    <script type="text/javascript" src="demo_async.js" async="async"></script>
+
+defer 是 HTML4 的，用法如下：
+
+    <script src="demo_defer.js" defer></script>
+
+---
 
 ## 了解 ES6 中的 Set 和 Map 吗？
 
