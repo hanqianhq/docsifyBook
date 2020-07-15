@@ -188,6 +188,29 @@ _英文字面上看来，好像是差不多意思_
 
 ---
 
+## 什么是 DOM 和 BOM？
+
+- #### DOM 文档对象模型
+
+把文档当做一个对象来看待  
+这个对象主要定义了处理网页内容的方法和接口
+
+- #### BOM 浏览器对象模型
+
+指的是把浏览器当做一个对象来对待  
+这个对象主要定义了与浏览器交互的方法和接口
+
+<br>
+
+BOM 的核心是 window  
+而 window 有 location 对象、navigator 对象、screen 对象等子对象
+
+<br>
+
+并且 DOM 的最根本对象 document 对象也是 BOM 的 window 对象的子对象
+
+---
+
 ## 什么是标签语义化
 
 ##### 为什么要使用语义化标签？
@@ -981,7 +1004,41 @@ Fomatting Context 是一个独立的渲染区域，有自己的一套渲染规�
 
 ## 正则表达式的使用程度
 
-## 用 ts 实现一个数组的去重
+## 如何实现一个数组去重？
+
+- #### 利用 ES6 新增的 Set
+
+      function uniq(array){
+        return [...new Set(array)];
+      }
+
+      uniq([1,2,3,5,3,2])
+
+- #### 利用 indexOf
+
+      function uniq(array){
+        var result = [];
+        for(var i = 0;i<arr.length;i++){
+          if(result.indexOf(array[i])===-1){
+            // 如果 result 中没有 array[i]，则添加到数组中
+            result.push(array[i])
+          }
+        }
+        return result;
+      }
+
+- #### 利用 includes
+
+      function uniq(array){
+        var result = [];
+        for(var i = 0;i<array.length;i++){
+          if(!result.includes(array[i])){
+            // 如果 result 中没有 array[i]，则添加到数组中
+            result.push(array[i])
+          }
+        }
+        return result;
+      }
 
 ## 手写 promise 的实现
 
@@ -1387,6 +1444,11 @@ NONONO，bar 作为一个闭包，即使它内部什么都没有，foo 中的所
 
 当事件响应时，通过冒泡机制触发它外部的元素身上的事件去执行
 
+<br>
+
+本质上利用了浏览器事件的冒泡机制  
+因为事件在冒泡过程中会传到父节点，父节点可以通过事件对象获取到目标节点
+
 ### 事件委托有什么好处？
 
 #### 1、减少内存消耗
@@ -1459,17 +1521,55 @@ http://www.zhangyunling.com/564.html
 
 ---
 
-## typeof 和 instanceof 的区别？
+## 了解数据类型判断吗？
 
-typeof 表示是对某个变量类型的检测，基本数据类型除了 null 都能正常的显示为对应的类型，引用类型除了函数会显示为'function'，其它都显示为 object
+- ### typeof
+
+对于原始类型来说，除了 null 都可以显示出其类型  
+但对于对象来说，除了函数，都会显示成 object 了
 
 <br>
 
-而 instanceof 它主要是用于检测某个构造函数的原型对象在不在某个对象的原型链上
+所以 typeof 并不能准确判断变量类型  
+我们可以使用 instanceof
 
----
+- ### instanceof
 
-## 数据类型转换？
+它可以判断对象类型  
+因为它的内部机制是通过判断对象的原型链中是不是能找到类型的 prototype
+
+<br>
+
+instanceof 能精准的判断引用数据类型  
+比如 Array、Function、Object
+
+<br>
+
+但是它又不能精确判断基本数据类型了
+
+- ### constructor
+
+
+    console.log((2).constructor === Number); // true
+    console.log((true).constructor === Boolean); // true
+    console.log(('str').constructor === String); // true
+    console.log(([]).constructor === Array); // true
+    console.log((function() {}).constructor === Function); // true
+    console.log(({}).constructor === Object); // true
+
+- ### Object.prototype.toString.call()
+
+
+    var a = Object.prototype.toString;
+
+    console.log(a.call(2));
+    console.log(a.call(true));
+    console.log(a.call('str'));
+    console.log(a.call([]));
+    console.log(a.call(function(){}));
+    console.log(a.call({}));
+    console.log(a.call(undefined));
+    console.log(a.call(null));
 
 ---
 
@@ -2295,21 +2395,108 @@ try..catch 错误处理也比较符合我们平常编写同步代码时候处理
 
 ---
 
-## 移动端的触摸事件了解吗
+## 函数表达式和函数声明有什么区别？
 
-## 对 ES6 的理解
+函数提升的区别  
+举个例子：
 
-## Interator 迭代器
+    hoistedFunc();
+    notHoistedFunc();
 
-## 一般怎么判断基本的数据类型
+    function hoistedFunc(){
+      console.log("注意：我会被提升");
+    }
 
-https://juejin.im/post/5b0554c86fb9a07acb3d3ddc
+    var notHoistedFunc = function(){
+      console.log("注意：我没有被提升");
+    }
 
-## 普通函数和构造函数的区别
+所以 notHoisterFunc 会报错，因为它没有被作用域提升
 
-## 深拷贝一个数组怎么做
+但是 hoistedFunc 就会正常运营，因为被提升了
 
-https://juejin.im/post/5a9516885188257a6b061d72
+---
+
+## 调用函数有哪些方法？
+
+- #### 作为函数调用
+
+
+    function add(a,b){
+      console.log(this);
+      return a + b;
+    }
+
+    add(1,5); // 打印 "window" 对象和 6
+
+    const o = {
+      method(callback){
+        callback();
+      }
+    }
+
+    o.method(function (){
+      console.log(this); // 打印 "window" 对象
+    });
+
+如果一个函数没有作为方法、构造函数、call、apply 调用时  
+此时 this 指向 window
+
+- #### 作为方法调用
+
+
+    const details = {
+      name : "Marko",
+      getName(){
+        return this.name;
+      }
+    }
+
+    details.getName(); // Marko
+
+如果一个对象的属性有一个函数的值，我们就称它为方法  
+调用该方法时，该方法的 this 值指向该对象
+
+- #### 作为构造函数调用
+
+
+    function Employee(name, position, yearHired) {
+      // 创建一个空对象 {}
+      // 然后将空对象分配给“this”关键字
+      // this = {};
+      this.name = name;
+      this.position = position;
+      this.yearHired = yearHired;
+      // 如果没有指定 return ,这里会默认返回 this
+    };
+
+    const emp = new Employee("Marko Polo", "Software Developer", 2017);
+
+构造函数里默认会创建一个空对象，this 指向的就是该对象
+
+- #### 使用 apply 和 call 方法调用
+
+
+    const obj1 = {
+     result:0
+    };
+
+    const obj2 = {
+     result:0
+    };
+
+
+    function reduceAdd(){
+       let result = 0;
+       for(let i = 0, len = arguments.length; i < len; i++){
+         result += arguments[i];
+       }
+       this.result = result;
+    }
+
+
+    reduceAdd.apply(obj1, [1, 2, 3, 4, 5]);  // reduceAdd 函数中的 this 对象将是 obj1
+    reduceAdd.call(obj2, 1, 2, 3, 4, 5); // reduceAdd 函数中的 this 对象将是 obj2
 
 ---
 
@@ -2324,18 +2511,6 @@ https://juejin.im/post/5ca6dd5c6fb9a05e2b24017a
 ---
 
 ## AJAX 核心四步操作？交互过程？
-
----
-
-## 底层运行机制：微任务宏任务和事件循环机制
-
----
-
-## Generator 生成器函数
-
----
-
-## 手写懒加载函数
 
 ---
 
@@ -3226,6 +3401,8 @@ _在注册后先放入 Event queue 的事件就会更早的离开 Event queue �
 
 - setTimeout
 - setInterval
+- 整体代码 script
+- I/O
 
 ##### 常见的微任务
 
@@ -3245,6 +3422,8 @@ _在注册后先放入 Event queue 的事件就会更早的离开 Event queue �
 <br>
 
 这个宏任务执行完再次检查队列内部的微任务，有就全部执行没有就再执行一个宏任务
+
+![av](/images/hongrenwuweirenwu.jpg)
 
 #### 几种已知的异步解决方案
 
