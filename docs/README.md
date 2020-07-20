@@ -998,11 +998,28 @@ Fomatting Context 是一个独立的渲染区域，有自己的一套渲染规�
 
 ## 复制一个数组有哪些方法？哪个方法最好
 
-## cdn 的作用和原理？
-
-## 响应式的浏览器原理？
-
 ## 正则表达式的使用程度
+
+---
+
+## arguments 了解吗？
+
+arguments 对象是函数中传递的参数值的集合，它是一个类似数组的对象  
+因为它有 length 属性，而且可以通过 arguments[i] 来访问单个值
+
+<br>
+
+但它没有数组的内置方法，比如 forEach、reduce、filter、map 等
+
+<br>
+
+想将这个集合转为数组，可以使用 Array.prototype.slice
+
+    Array.prototype.slice.call(arguments);
+
+> 注意：箭头函数是没有 arguments 对象的
+
+---
 
 ## 如何实现一个数组去重？
 
@@ -1124,14 +1141,6 @@ person1 和 person2 都是 Person 的实例
 如果还查不到，就去找原型的原型，一直找到最顶层为止
 
 > 这个查找的过程，就叫做原型链
-
----
-
-## 了解 vue-lazyloader 吗
-
----
-
-## 如何判断一个类型是数组？instanceOf 实现？
 
 ---
 
@@ -2229,8 +2238,8 @@ _async 是 ES7 新出的特性，表明当前函数是异步函数，不会阻�
 
 ![av](/images/async.png)
 
-> async 表示函数里有异步操作
-> await 表示紧跟在后面的表达式需要等待结果
+> async 是异步的意思
+> await 表示紧跟在后面的表达式需要等待结果，即异步等待
 
 返回的是一个 promise 对象，状态为 resolved，参数是 return 的值  
 再看下面这个函数：
@@ -2249,11 +2258,6 @@ _async 是 ES7 新出的特性，表明当前函数是异步函数，不会阻�
 
 上面的执行结果是先打印出'我先执行'，虽然是上面 asyncFn()先执行，但是已经被定义异步函数了，不会影响后续函数的执行
 
-<br>
-
-async 定义的函数内部会默认返回一个 promise 对象  
-如果函数内部抛出异常或者是返回 reject，都会使函数的 promise 状态为失败 reject
-
 ### await 是什么？
 
 await 意思是 async wait(异步等待)
@@ -2265,8 +2269,17 @@ await 意思是 async wait(异步等待)
 
 <br>
 
-举个栗子，await 是学生，async 是校车
-必须等人齐了才开车
+语义上很好理解，async 用来声音一个 function 是异步的  
+而 await 用于等待一个异步方法执行完成
+
+<br>
+
+如果一个函数加上了 async，那么函数就会返回一一个 Promise
+
+    async function test(){
+    	return "1"
+    }
+    console.log(test())  // Promise{<resolved>:"1"}
 
 <br>
 
@@ -2292,6 +2305,40 @@ await 后面的函数会先执行一遍(比如 await Fn()的 Fn ,并非是下一
 等本轮事件循环执行完了之后又会跳回到 async 函数中等待 await 后面表达式的返回值，如果返回值为非 promise 则继续执行 async 函数后面的代码  
 否则将返回的 promise 放入 Promise 队列（Promise 的 Job Queue）
 
+### async 和 promise 的直观差别
+
+#### 使用 Promise
+
+    function doIt() {
+        console.time("doIt");
+        const time1 = 300;
+        step1(time1)
+            .then(time2 => step2(time2))
+            .then(time3 => step3(time3))
+            .then(result => {
+                console.log(`result is ${result}`);
+            });
+    }
+    doIt();
+    // step1 with 300
+    // step2 with 500
+    // step3 with 700
+    // result is 900
+
+#### 使用 async/await
+
+    async function doIt() {
+        console.time("doIt");
+        const time1 = 300;
+        const time2 = await step1(time1);
+        const time3 = await step2(time2);
+        const result = await step3(time3);
+        console.log(`result is ${result}`);
+    }
+    doIt();
+
+结果和之前的 Promise 实现是一样的，但是这个代码看起来是不是清晰得多，优雅整洁，几乎跟同步代码一样
+
 ### 其实，async 函数，最难的在错误的处理上
 
 async 里如果有多个 await 函数的时候，如果其中任一一个抛出异常或者报错了  
@@ -2313,10 +2360,6 @@ async 里如果有多个 await 函数的时候，如果其中任一一个抛出�
     }
     throwError().then(success => console.log('成功', last))
                 .catch(error => console.log('失败',last))
-
-未完待续...
-
-https://juejin.im/post/5b1ffff96fb9a01e345ba704
 
 ### 总结一下 Async/Await 的简介和用法
 
@@ -2390,6 +2433,11 @@ try..catch 错误处理也比较符合我们平常编写同步代码时候处理
 使用使用 async/await 编写可以大大地提高可读性：
 
 ![av](/images/awaitif.png)
+
+#### 但是 async/await 也存在一些缺点
+
+因为 await 将异步代码改造成了同步，如果多个异步之间没有依赖性却使用了 await  
+那么这就会导致性能上的降低
 
 > 异步编程的最高境界，就是根本不关心它是不是异步
 
