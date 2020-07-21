@@ -11,6 +11,7 @@
   - [can i use](https://caniuse.com/)
   - [Am I Responsive](http://ami.responsivedesign.is/)
   - [Anime.js](http://ami.responsivedesign.is/)
+  - [hehe](hehe.md)
 
 * 手册们
 
@@ -26,5 +27,10 @@
 
   - ##### 免费素材
   - [Pexels](https://www.pexels.com/zh-cn/)
+
+* 语录
+
+  - ##### 瞎说职场
+  - [瞎说职场](job.md)
 
 * [回到首页](README.md)
